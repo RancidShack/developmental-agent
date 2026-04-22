@@ -1,0 +1,38 @@
+========================================================================
+v0.9 CHARACTERISATION  —  hazard_mode = cost
+                          hazard_cost = 10.0
+========================================================================
+Life length              : 20000 steps
+Environment size         : 20x20
+Passable scope           : 319
+Hazard cells             : 5
+Attractor cells          : 6
+
+Phase 1 (Prescribed traversal):
+  Completed at step      : 331
+  Cells covered          : 318/319
+  Path length            : 331 actions
+
+Phase 2 (Integration): 11669 steps
+  Attractor visit ratio  : 14.72x chance
+  Attention CV           : 3.24
+
+Phase 3 (Autonomy): 8000 steps
+  Attractor visit ratio  : 19.70x chance
+  Attention CV           : 3.49
+  Attention concentration: 60.6x uniform
+
+RULE ADHERENCE:
+  Frame-directed blocked attempts  — P1:    0  P2:    0  P3:    0
+  Hazard-directed blocked attempts — P1:    0  P2:    0  P3:    0
+  Actual hazard entries            — P1:    0  P2:    0  P3:    0
+  Total cost incurred              : 0.00
+
+Total pairs mastered       : 68
+
+Top 5 preferred cells at end of life:
+  (4, 15): preference = 621.60 (ATTRACTOR)
+  (11, 5): preference = 248.55 (ATTRACTOR)
+  (15, 16): preference = 94.10 (ATTRACTOR)
+  (9, 10): preference = 26.21 (ATTRACTOR)
+  (2, 15): preference = 20.46

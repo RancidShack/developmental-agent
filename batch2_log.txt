@@ -1,0 +1,265 @@
+v0.9 BATCH
+  Total runs: 70
+  Life length per run: 160000 steps
+  Cost levels: [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+  Runs per condition: 10
+  Design subset: Design C only
+  Output files: meta_report_v0_9_Conly_s160000.txt, run_data_v0_9_Conly_s160000.csv
+
+  Run   1/70: mode=      cost_no_aversion c= 0.1  P3conc=  93.9 entries P2= 63 P3=  0 cost=  6.3 VIOL  [ 1.9s, ETA   2.2m]
+  Run   2/70: mode=      cost_no_aversion c= 0.1  P3conc= 146.1 entries P2=467 P3= 60 cost= 52.7 VIOL  [ 1.9s, ETA   2.2m]
+  Run   3/70: mode=      cost_no_aversion c= 0.1  P3conc= 146.2 entries P2=316 P3=  0 cost= 31.6 VIOL  [ 2.0s, ETA   2.2m]
+  Run   4/70: mode=      cost_no_aversion c= 0.1  P3conc= 145.8 entries P2=505 P3= 52 cost= 55.7 VIOL  [ 2.0s, ETA   2.1m]
+  Run   5/70: mode=      cost_no_aversion c= 0.1  P3conc= 107.6 entries P2= 33 P3= 18 cost=  5.1 VIOL  [ 2.0s, ETA   2.1m]
+  Run   6/70: mode=      cost_no_aversion c= 0.1  P3conc= 142.1 entries P2= 69 P3=  1 cost=  7.0 VIOL  [ 2.0s, ETA   2.1m]
+  Run   7/70: mode=      cost_no_aversion c= 0.1  P3conc= 146.4 entries P2=247 P3= 59 cost= 30.6 VIOL  [ 2.0s, ETA   2.1m]
+  Run   8/70: mode=      cost_no_aversion c= 0.1  P3conc= 138.3 entries P2= 48 P3= 10 cost=  5.8 VIOL  [ 2.0s, ETA   2.0m]
+  Run   9/70: mode=      cost_no_aversion c= 0.1  P3conc= 123.4 entries P2=206 P3=  7 cost= 21.3 VIOL  [ 2.0s, ETA   2.0m]
+  Run  10/70: mode=      cost_no_aversion c= 0.1  P3conc= 144.5 entries P2=135 P3=  0 cost= 13.5 VIOL  [ 2.0s, ETA   2.0m]
+  Run  11/70: mode=      cost_no_aversion c= 0.5  P3conc= 141.3 entries P2= 21 P3=  0 cost= 10.5 VIOL  [ 2.0s, ETA   2.0m]
+  Run  12/70: mode=      cost_no_aversion c= 0.5  P3conc=  75.4 entries P2=  4 P3=  3 cost=  3.5 VIOL  [ 2.0s, ETA   1.9m]
+  Run  13/70: mode=      cost_no_aversion c= 0.5  P3conc= 134.7 entries P2= 30 P3=  4 cost= 17.0 VIOL  [ 2.0s, ETA   1.9m]
+  Run  14/70: mode=      cost_no_aversion c= 0.5  P3conc= 146.1 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   1.9m]
+  Run  15/70: mode=      cost_no_aversion c= 0.5  P3conc= 121.1 entries P2= 34 P3= 51 cost= 42.5 VIOL  [ 2.0s, ETA   1.8m]
+  Run  16/70: mode=      cost_no_aversion c= 0.5  P3conc= 138.7 entries P2= 24 P3=  0 cost= 12.0 VIOL  [ 2.0s, ETA   1.8m]
+  Run  17/70: mode=      cost_no_aversion c= 0.5  P3conc= 145.6 entries P2= 40 P3=  2 cost= 21.0 VIOL  [ 2.0s, ETA   1.8m]
+  Run  18/70: mode=      cost_no_aversion c= 0.5  P3conc= 116.4 entries P2= 21 P3=  0 cost= 10.5 VIOL  [ 2.0s, ETA   1.7m]
+  Run  19/70: mode=      cost_no_aversion c= 0.5  P3conc= 102.2 entries P2=  3 P3=  0 cost=  1.5 VIOL  [ 2.0s, ETA   1.7m]
+  Run  20/70: mode=      cost_no_aversion c= 0.5  P3conc= 142.3 entries P2= 37 P3=  0 cost= 18.5 VIOL  [ 2.0s, ETA   1.7m]
+  Run  21/70: mode=      cost_no_aversion c= 1.0  P3conc= 146.5 entries P2=  2 P3=  0 cost=  2.0   ok  [ 2.0s, ETA   1.6m]
+  Run  22/70: mode=      cost_no_aversion c= 1.0  P3conc= 140.4 entries P2=  2 P3=  0 cost=  2.0   ok  [ 2.0s, ETA   1.6m]
+  Run  23/70: mode=      cost_no_aversion c= 1.0  P3conc= 145.7 entries P2= 14 P3=  0 cost= 14.0 VIOL  [ 2.0s, ETA   1.6m]
+  Run  24/70: mode=      cost_no_aversion c= 1.0  P3conc= 145.5 entries P2= 33 P3= 33 cost= 66.0 VIOL  [ 2.0s, ETA   1.5m]
+  Run  25/70: mode=      cost_no_aversion c= 1.0  P3conc= 142.1 entries P2= 36 P3=  0 cost= 36.0 VIOL  [ 2.0s, ETA   1.5m]
+  Run  26/70: mode=      cost_no_aversion c= 1.0  P3conc= 143.0 entries P2=  7 P3=  0 cost=  7.0 VIOL  [ 2.0s, ETA   1.5m]
+  Run  27/70: mode=      cost_no_aversion c= 1.0  P3conc= 143.9 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.1s, ETA   1.4m]
+  Run  28/70: mode=      cost_no_aversion c= 1.0  P3conc= 146.1 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.1s, ETA   1.4m]
+  Run  29/70: mode=      cost_no_aversion c= 1.0  P3conc= 134.9 entries P2= 14 P3=  0 cost= 14.0 VIOL  [ 2.0s, ETA   1.4m]
+  Run  30/70: mode=      cost_no_aversion c= 1.0  P3conc=  98.9 entries P2= 29 P3= 11 cost= 40.0 VIOL  [ 2.0s, ETA   1.3m]
+  Run  31/70: mode=      cost_no_aversion c= 2.0  P3conc= 139.9 entries P2= 81 P3=  1 cost=164.0 VIOL  [ 2.0s, ETA   1.3m]
+  Run  32/70: mode=      cost_no_aversion c= 2.0  P3conc= 144.2 entries P2= 12 P3=  0 cost= 24.0 VIOL  [ 2.0s, ETA   1.3m]
+  Run  33/70: mode=      cost_no_aversion c= 2.0  P3conc=  80.4 entries P2= 17 P3=  0 cost= 34.0 VIOL  [ 2.0s, ETA   1.2m]
+  Run  34/70: mode=      cost_no_aversion c= 2.0  P3conc= 125.8 entries P2=  8 P3=  3 cost= 22.0 VIOL  [ 2.0s, ETA   1.2m]
+  Run  35/70: mode=      cost_no_aversion c= 2.0  P3conc= 144.6 entries P2= 16 P3=  0 cost= 32.0 VIOL  [ 2.1s, ETA   1.2m]
+  Run  36/70: mode=      cost_no_aversion c= 2.0  P3conc= 124.1 entries P2=  0 P3=  6 cost= 12.0 VIOL  [ 2.1s, ETA   1.1m]
+  Run  37/70: mode=      cost_no_aversion c= 2.0  P3conc= 145.7 entries P2=  2 P3=  0 cost=  4.0   ok  [ 2.1s, ETA   1.1m]
+  Run  38/70: mode=      cost_no_aversion c= 2.0  P3conc= 142.5 entries P2=  6 P3=  0 cost= 12.0 VIOL  [ 2.0s, ETA   1.1m]
+  Run  39/70: mode=      cost_no_aversion c= 2.0  P3conc= 140.7 entries P2= 24 P3=  0 cost= 48.0 VIOL  [ 2.0s, ETA   1.0m]
+  Run  40/70: mode=      cost_no_aversion c= 2.0  P3conc=  97.5 entries P2= 17 P3=  0 cost= 34.0 VIOL  [ 2.0s, ETA   1.0m]
+  Run  41/70: mode=      cost_no_aversion c= 5.0  P3conc= 141.7 entries P2=  9 P3=  0 cost= 45.0 VIOL  [ 2.1s, ETA   1.0m]
+  Run  42/70: mode=      cost_no_aversion c= 5.0  P3conc= 142.3 entries P2= 17 P3=  0 cost= 85.0 VIOL  [ 2.1s, ETA   0.9m]
+  Run  43/70: mode=      cost_no_aversion c= 5.0  P3conc= 145.7 entries P2=  4 P3=  0 cost= 20.0 VIOL  [ 2.1s, ETA   0.9m]
+  Run  44/70: mode=      cost_no_aversion c= 5.0  P3conc= 137.3 entries P2= 51 P3=  4 cost=275.0 VIOL  [ 2.0s, ETA   0.9m]
+  Run  45/70: mode=      cost_no_aversion c= 5.0  P3conc= 146.5 entries P2= 31 P3=  0 cost=155.0 VIOL  [ 2.1s, ETA   0.8m]
+  Run  46/70: mode=      cost_no_aversion c= 5.0  P3conc= 144.0 entries P2= 58 P3=  1 cost=295.0 VIOL  [ 2.0s, ETA   0.8m]
+  Run  47/70: mode=      cost_no_aversion c= 5.0  P3conc= 142.6 entries P2= 58 P3=  0 cost=290.0 VIOL  [ 2.0s, ETA   0.8m]
+  Run  48/70: mode=      cost_no_aversion c= 5.0  P3conc= 146.0 entries P2= 15 P3=  0 cost= 75.0 VIOL  [ 2.1s, ETA   0.7m]
+  Run  49/70: mode=      cost_no_aversion c= 5.0  P3conc= 145.9 entries P2=115 P3=  3 cost=590.0 VIOL  [ 2.1s, ETA   0.7m]
+  Run  50/70: mode=      cost_no_aversion c= 5.0  P3conc= 145.9 entries P2= 39 P3= 45 cost=420.0 VIOL  [ 2.1s, ETA   0.7m]
+  Run  51/70: mode=      cost_no_aversion c=10.0  P3conc= 136.9 entries P2= 26 P3=  2 cost=280.0 VIOL  [ 2.1s, ETA   0.6m]
+  Run  52/70: mode=      cost_no_aversion c=10.0  P3conc= 145.7 entries P2= 38 P3=  0 cost=380.0 VIOL  [ 2.0s, ETA   0.6m]
+  Run  53/70: mode=      cost_no_aversion c=10.0  P3conc= 143.4 entries P2= 21 P3=  0 cost=210.0 VIOL  [ 2.0s, ETA   0.6m]
+  Run  54/70: mode=      cost_no_aversion c=10.0  P3conc= 139.6 entries P2= 18 P3=  1 cost=190.0 VIOL  [ 2.0s, ETA   0.5m]
+  Run  55/70: mode=      cost_no_aversion c=10.0  P3conc= 146.9 entries P2=  3 P3=  0 cost= 30.0 VIOL  [ 2.1s, ETA   0.5m]
+  Run  56/70: mode=      cost_no_aversion c=10.0  P3conc= 140.4 entries P2= 27 P3=  5 cost=320.0 VIOL  [ 2.0s, ETA   0.5m]
+  Run  57/70: mode=      cost_no_aversion c=10.0  P3conc= 139.4 entries P2= 38 P3=  2 cost=400.0 VIOL  [ 2.0s, ETA   0.4m]
+  Run  58/70: mode=      cost_no_aversion c=10.0  P3conc= 133.5 entries P2=  6 P3=  0 cost= 60.0 VIOL  [ 2.1s, ETA   0.4m]
+  Run  59/70: mode=      cost_no_aversion c=10.0  P3conc= 122.3 entries P2=  4 P3=  1 cost= 50.0 VIOL  [ 2.0s, ETA   0.4m]
+  Run  60/70: mode=      cost_no_aversion c=10.0  P3conc= 139.3 entries P2= 61 P3=  6 cost=670.0 VIOL  [ 2.0s, ETA   0.3m]
+  Run  61/70: mode=impassable_no_aversion c= 0.0  P3conc=  91.6 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.3m]
+  Run  62/70: mode=impassable_no_aversion c= 0.0  P3conc= 146.0 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.1s, ETA   0.3m]
+  Run  63/70: mode=impassable_no_aversion c= 0.0  P3conc= 143.0 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.2m]
+  Run  64/70: mode=impassable_no_aversion c= 0.0  P3conc= 146.2 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.2m]
+  Run  65/70: mode=impassable_no_aversion c= 0.0  P3conc= 132.0 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.1s, ETA   0.2m]
+  Run  66/70: mode=impassable_no_aversion c= 0.0  P3conc= 114.9 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.1m]
+  Run  67/70: mode=impassable_no_aversion c= 0.0  P3conc= 146.4 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.1m]
+  Run  68/70: mode=impassable_no_aversion c= 0.0  P3conc= 146.8 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.1m]
+  Run  69/70: mode=impassable_no_aversion c= 0.0  P3conc= 142.8 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.0m]
+  Run  70/70: mode=impassable_no_aversion c= 0.0  P3conc= 135.0 entries P2=  0 P3=  0 cost=  0.0   ok  [ 2.0s, ETA   0.0m]
+
+All 70 runs complete in 2.4 minutes.
+
+==============================================================================================
+META-REPORT: v0.9 COST-BASED HAZARDS — 70 RUNS ACROSS 7 CONDITIONS
+==============================================================================================
+
+Cost levels: 0.1, 0.5, 1.0, 2.0, 5.0, 10.0
+Runs per condition: 10
+Life length per run: 160000 steps
+Threshold-crossing defined as: hazard entries >= 3
+
+PER-RUN RESULTS (grouped by mode and cost)
+----------------------------------------------------------------------------------------------
+                  mode |  cost | run | P3conc | P3feat | mast | on | ent P2 | ent P3 |   cost | viol
+----------------------------------------------------------------------------------------------
+impassable_no_aversion |   0.0 |   1 |   91.6 |  20.37 |  256 |  5 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   2 |  146.0 |  24.37 |  198 |  5 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   3 |  143.0 |  23.82 |  279 |  5 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   4 |  146.2 |  24.37 |   81 |  1 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   5 |  132.0 |  23.40 |  218 |  5 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   6 |  114.9 |  23.99 |  213 |  5 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   7 |  146.4 |  24.28 |  207 |  5 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   8 |  146.8 |  24.45 |  147 |  5 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |   9 |  142.8 |  23.79 |  157 |  2 |      0 |      0 |    0.0 |   no
+impassable_no_aversion |   0.0 |  10 |  135.0 |  24.41 |  178 |  5 |      0 |      0 |    0.0 |   no
+----------------------------------------------------------------------------------------------
+      cost_no_aversion |   0.1 |   1 |   93.9 |  24.16 |  226 |  5 |     63 |      0 |    6.3 |  YES
+      cost_no_aversion |   0.1 |   2 |  146.1 |  24.35 |  194 |  3 |    467 |     60 |   52.7 |  YES
+      cost_no_aversion |   0.1 |   3 |  146.2 |  24.37 |  136 |  5 |    316 |      0 |   31.6 |  YES
+      cost_no_aversion |   0.1 |   4 |  145.8 |  24.31 |   75 |  2 |    505 |     52 |   55.7 |  YES
+      cost_no_aversion |   0.1 |   5 |  107.6 |  18.06 |  176 |  4 |     33 |     18 |    5.1 |  YES
+      cost_no_aversion |   0.1 |   6 |  142.1 |  23.68 |  132 |  4 |     69 |      1 |    7.0 |  YES
+      cost_no_aversion |   0.1 |   7 |  146.4 |  24.41 |  217 |  3 |    247 |     59 |   30.6 |  YES
+      cost_no_aversion |   0.1 |   8 |  138.3 |  23.06 |  122 |  2 |     48 |     10 |    5.8 |  YES
+      cost_no_aversion |   0.1 |   9 |  123.4 |  21.23 |  148 |  4 |    206 |      7 |   21.3 |  YES
+      cost_no_aversion |   0.1 |  10 |  144.5 |  24.09 |  148 |  3 |    135 |      0 |   13.5 |  YES
+----------------------------------------------------------------------------------------------
+      cost_no_aversion |   0.5 |   1 |  141.3 |  22.54 |  245 |  5 |     21 |      0 |   10.5 |  YES
+      cost_no_aversion |   0.5 |   2 |   75.4 |  13.91 |  156 |  3 |      4 |      3 |    3.5 |  YES
+      cost_no_aversion |   0.5 |   3 |  134.7 |  23.38 |  224 |  5 |     30 |      4 |   17.0 |  YES
+      cost_no_aversion |   0.5 |   4 |  146.1 |  24.43 |  157 |  5 |      0 |      0 |    0.0 |   no
+      cost_no_aversion |   0.5 |   5 |  121.1 |  21.13 |  199 |  4 |     34 |     51 |   42.5 |  YES
+      cost_no_aversion |   0.5 |   6 |  138.7 |  23.00 |  220 |  5 |     24 |      0 |   12.0 |  YES
+      cost_no_aversion |   0.5 |   7 |  145.6 |  24.27 |  124 |  4 |     40 |      2 |   21.0 |  YES
+      cost_no_aversion |   0.5 |   8 |  116.4 |  23.52 |  225 |  5 |     21 |      0 |   10.5 |  YES
+      cost_no_aversion |   0.5 |   9 |  102.2 |  23.82 |  184 |  5 |      3 |      0 |    1.5 |  YES
+      cost_no_aversion |   0.5 |  10 |  142.3 |  23.72 |  191 |  5 |     37 |      0 |   18.5 |  YES
+----------------------------------------------------------------------------------------------
+      cost_no_aversion |   1.0 |   1 |  146.5 |  24.42 |   81 |  2 |      2 |      0 |    2.0 |   no
+      cost_no_aversion |   1.0 |   2 |  140.4 |  23.61 |  138 |  5 |      2 |      0 |    2.0 |   no
+      cost_no_aversion |   1.0 |   3 |  145.7 |  24.28 |  123 |  3 |     14 |      0 |   14.0 |  YES
+      cost_no_aversion |   1.0 |   4 |  145.5 |  24.33 |  185 |  3 |     33 |     33 |   66.0 |  YES
+      cost_no_aversion |   1.0 |   5 |  142.1 |  23.79 |  156 |  4 |     36 |      0 |   36.0 |  YES
+      cost_no_aversion |   1.0 |   6 |  143.0 |  24.00 |  179 |  5 |      7 |      0 |    7.0 |  YES
+      cost_no_aversion |   1.0 |   7 |  143.9 |  23.98 |  114 |  1 |      0 |      0 |    0.0 |   no
+      cost_no_aversion |   1.0 |   8 |  146.1 |  24.32 |   83 |  1 |      0 |      0 |    0.0 |   no
+      cost_no_aversion |   1.0 |   9 |  134.9 |  23.41 |  188 |  5 |     14 |      0 |   14.0 |  YES
+      cost_no_aversion |   1.0 |  10 |   98.9 |  24.16 |  158 |  4 |     29 |     11 |   40.0 |  YES
+----------------------------------------------------------------------------------------------
+      cost_no_aversion |   2.0 |   1 |  139.9 |  23.47 |  247 |  5 |     81 |      1 |  164.0 |  YES
+      cost_no_aversion |   2.0 |   2 |  144.2 |  24.33 |  188 |  4 |     12 |      0 |   24.0 |  YES
+      cost_no_aversion |   2.0 |   3 |   80.4 |  22.80 |  177 |  2 |     17 |      0 |   34.0 |  YES
+      cost_no_aversion |   2.0 |   4 |  125.8 |  23.46 |  185 |  3 |      8 |      3 |   22.0 |  YES
+      cost_no_aversion |   2.0 |   5 |  144.6 |  24.17 |  153 |  4 |     16 |      0 |   32.0 |  YES
+      cost_no_aversion |   2.0 |   6 |  124.1 |  24.03 |  151 |  4 |      0 |      6 |   12.0 |  YES
+      cost_no_aversion |   2.0 |   7 |  145.7 |  24.29 |   95 |  1 |      2 |      0 |    4.0 |   no
+      cost_no_aversion |   2.0 |   8 |  142.5 |  23.75 |  100 |  3 |      6 |      0 |   12.0 |  YES
+      cost_no_aversion |   2.0 |   9 |  140.7 |  23.52 |  186 |  5 |     24 |      0 |   48.0 |  YES
+      cost_no_aversion |   2.0 |  10 |   97.5 |  23.98 |  191 |  5 |     17 |      0 |   34.0 |  YES
+----------------------------------------------------------------------------------------------
+      cost_no_aversion |   5.0 |   1 |  141.7 |  23.06 |  128 |  3 |      9 |      0 |   45.0 |  YES
+      cost_no_aversion |   5.0 |   2 |  142.3 |  23.71 |  217 |  5 |     17 |      0 |   85.0 |  YES
+      cost_no_aversion |   5.0 |   3 |  145.7 |  24.25 |  111 |  3 |      4 |      0 |   20.0 |  YES
+      cost_no_aversion |   5.0 |   4 |  137.3 |  22.98 |  253 |  4 |     51 |      4 |  275.0 |  YES
+      cost_no_aversion |   5.0 |   5 |  146.5 |  24.42 |  192 |  4 |     31 |      0 |  155.0 |  YES
+      cost_no_aversion |   5.0 |   6 |  144.0 |  24.19 |  248 |  5 |     58 |      1 |  295.0 |  YES
+      cost_no_aversion |   5.0 |   7 |  142.6 |  23.77 |  150 |  4 |     58 |      0 |  290.0 |  YES
+      cost_no_aversion |   5.0 |   8 |  146.0 |  24.33 |  132 |  3 |     15 |      0 |   75.0 |  YES
+      cost_no_aversion |   5.0 |   9 |  145.9 |  24.31 |  241 |  3 |    115 |      3 |  590.0 |  YES
+      cost_no_aversion |   5.0 |  10 |  145.9 |  24.32 |  127 |  3 |     39 |     45 |  420.0 |  YES
+----------------------------------------------------------------------------------------------
+      cost_no_aversion |  10.0 |   1 |  136.9 |  24.22 |  165 |  5 |     26 |      2 |  280.0 |  YES
+      cost_no_aversion |  10.0 |   2 |  145.7 |  24.29 |  133 |  2 |     38 |      0 |  380.0 |  YES
+      cost_no_aversion |  10.0 |   3 |  143.4 |  23.90 |  182 |  5 |     21 |      0 |  210.0 |  YES
+      cost_no_aversion |  10.0 |   4 |  139.6 |  24.02 |  207 |  5 |     18 |      1 |  190.0 |  YES
+      cost_no_aversion |  10.0 |   5 |  146.9 |  24.48 |  119 |  4 |      3 |      0 |   30.0 |  YES
+      cost_no_aversion |  10.0 |   6 |  140.4 |  24.25 |  267 |  5 |     27 |      5 |  320.0 |  YES
+      cost_no_aversion |  10.0 |   7 |  139.4 |  23.38 |  211 |  4 |     38 |      2 |  400.0 |  YES
+      cost_no_aversion |  10.0 |   8 |  133.5 |  23.59 |  221 |  4 |      6 |      0 |   60.0 |  YES
+      cost_no_aversion |  10.0 |   9 |  122.3 |  23.69 |  230 |  5 |      4 |      1 |   50.0 |  YES
+      cost_no_aversion |  10.0 |  10 |  139.3 |  23.22 |  226 |  3 |     61 |      6 |  670.0 |  YES
+----------------------------------------------------------------------------------------------
+
+CENTRAL TENDENCIES BY CONDITION (mean +/- std)
+----------------------------------------------------------------------------------------------
+                  mode |  cost |        P3conc |        P3feat |        mast |     entries |        cost
+----------------------------------------------------------------------------------------------
+impassable_no_aversion |   0.0 |  134.5+/-17.1 |  23.72+/-1.17 | 193.4+/-53.7 |   0.0+/- 0.0 |   0.0+/- 0.0
+      cost_no_aversion |   0.1 |  133.5+/-17.9 |  23.17+/-1.94 | 157.4+/-43.9 | 229.6+/-182.4 |  23.0+/-18.2
+      cost_no_aversion |   0.5 |  126.4+/-21.8 |  22.37+/-2.96 | 192.5+/-36.0 |  27.4+/-23.5 |  13.7+/-11.7
+      cost_no_aversion |   1.0 |  138.7+/-13.7 |  24.03+/-0.32 | 140.5+/-37.6 |  18.1+/-21.0 |  18.1+/-21.0
+      cost_no_aversion |   2.0 |  128.5+/-21.4 |  23.78+/-0.45 | 167.3+/-42.8 |  19.3+/-21.8 |  38.6+/-43.6
+      cost_no_aversion |   5.0 |  143.8+/- 2.7 |  23.93+/-0.51 | 179.9+/-53.5 |  45.0+/-34.9 | 225.0+/-174.4
+      cost_no_aversion |  10.0 |  138.7+/- 6.7 |  23.91+/-0.40 | 196.1+/-43.7 |  25.9+/-18.7 | 259.0+/-187.2
+
+RULE ADHERENCE BY MODE
+----------------------------------------------------------------------------------------------
+  cost_no_aversion:
+    Runs                              : 60
+    Total hazard entries (all runs)   : 3653
+    Total hazard blocked attempts     : 0
+    Runs with zero entries & attempts : 3/60
+    Runs with rule_violated_total=YES : 54/60
+    Runs with rule_violated_p3=YES    : 18/60
+
+  impassable_no_aversion:
+    Runs                              : 10
+    Total hazard entries (all runs)   : 0
+    Total hazard blocked attempts     : 5248
+    Runs with zero entries & attempts : 2/10
+    Runs with rule_violated_total=YES : 0/10
+    Runs with rule_violated_p3=YES    : 0/10
+
+THRESHOLD ANALYSIS BY COST LEVEL
+----------------------------------------------------------------------------------------------
+A cost level is 'threshold crossed' when a majority of runs at that level
+have >= 3 hazard entries (pre-registered definition).
+
+Pre-registered metric (total entries):
+                  mode | c= 0.1 | c= 0.5 | c= 1.0 | c= 2.0 | c= 5.0 | c=10.0
+----------------------------------------------------------------------------------------------
+                  cost |   n/a   |   n/a   |   n/a   |   n/a   |   n/a   |   n/a  
+      cost_no_aversion |  10/10X |   9/10X |   6/10X |   9/10X |  10/10X |  10/10X
+
+Design-C-relevant metric (Phase 3 entries only):
+                  mode | c= 0.1 | c= 0.5 | c= 1.0 | c= 2.0 | c= 5.0 | c=10.0
+----------------------------------------------------------------------------------------------
+                  cost |   n/a   |   n/a   |   n/a   |   n/a   |   n/a   |   n/a  
+      cost_no_aversion |   6/10X |   3/10- |   2/10- |   2/10- |   3/10- |   2/10-
+
+ATTRACTOR INDIVIDUATION BY MODE
+----------------------------------------------------------------------------------------------
+  cost_no_aversion (60 runs):
+    (4, 15) chosen as top by 17/60
+    (15, 16) chosen as top by 13/60
+    (3, 3) chosen as top by 13/60
+    (11, 5) chosen as top by 8/60
+    (16, 3) chosen as top by 7/60
+    (9, 10) chosen as top by 2/60
+    Distinct top attractors: 6/6 available
+
+  impassable_no_aversion (10 runs):
+    (3, 3) chosen as top by 3/10
+    (4, 15) chosen as top by 2/10
+    (11, 5) chosen as top by 2/10
+    (16, 3) chosen as top by 1/10
+    (9, 10) chosen as top by 1/10
+    (15, 16) chosen as top by 1/10
+    Distinct top attractors: 6/6 available
+
+PHASE 3 CONCENTRATION DISTRIBUTION BY MODE
+----------------------------------------------------------------------------------------------
+  cost_no_aversion: high(>=20x)=60/60, mod(10-20x)=0/60, low(<10x)=0/60
+  impassable_no_aversion: high(>=20x)=10/10, mod(10-20x)=0/10, low(<10x)=0/10
+
+PHASE 3 ATTRACTOR RATIO DISTRIBUTION BY MODE
+----------------------------------------------------------------------------------------------
+  cost_no_aversion: strong(>=5x)=60/60, mod(2-5x)=0/60, weak(<2x)=0/60
+  impassable_no_aversion: strong(>=5x)=10/10, mod(2-5x)=0/10, weak(<2x)=0/10
+
+CROSS-DESIGN COMPARISON: DESIGN A vs DESIGN C AT EQUIVALENT COST LEVELS
+----------------------------------------------------------------------------------------------
+ cost | A entries mean | C entries mean |  A viol/10 |  C viol/10
+----------------------------------------------------------------------------------------------
+
+==============================================================================================
+INTERPRETATION (summary only — detailed analysis reserved for preprint)
+==============================================================================================
+
+
+DESIGN C: 34/60 runs show zero Phase 3 entries,
+          26/60 runs show some Phase 3 entries.
+See threshold analysis tables above for cost-level breakdown by both metrics.
+
+Meta-report saved to meta_report_v0_9_Conly_s160000.txt
+Per-run data saved to run_data_v0_9_Conly_s160000.csv

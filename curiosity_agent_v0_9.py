@@ -64,7 +64,7 @@ AVERSION_PENALTY = -5.0      # applied to FRAME always; to HAZARD in
 ATTRACTION_BONUS = 0.3
 
 # v0.9 additions
-HAZARD_MODE = "cost"         # one of: "impassable", "impassable_no_aversion",
+HAZARD_MODE = "cost_no_aversion"         # one of: "impassable", "impassable_no_aversion",
                              # "cost", "cost_no_aversion"
 HAZARD_COST = 1.0            # scalar subtracted from intrinsic reward on
                              # hazard entry; only applies in cost modes
