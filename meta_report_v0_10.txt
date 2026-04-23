@@ -1,0 +1,118 @@
+============================================================================
+v0.10 BATCH META-REPORT
+============================================================================
+Total runs: 360
+Compute time: 7.0 minutes (419s)
+
+
+--- RUN LENGTH: 20000 steps ---
+
+  Architecture: v0_10
+    Cost | P3_clean | Full_clean | Mean_P3_ent | Mean_total_cost | Mean_mastered | Flagged
+  ------ | -------- | ---------- | ----------- | --------------- | ------------- | -------
+    0.10 |   8/10   |   2/10     |        1.00 |            0.81 |          75.3 |   2.6/5
+    0.50 |  10/10   |   3/10     |        0.40 |            2.60 |          73.5 |   1.1/5
+    1.00 |  10/10   |   2/10     |        0.10 |            5.80 |          69.1 |   1.1/5
+    2.00 |  10/10   |   4/10     |        0.10 |            7.20 |          74.7 |   0.8/5
+    5.00 |   5/10   |   0/10     |        1.90 |           35.50 |          78.4 |   1.4/5
+   10.00 |  10/10   |   0/10     |        0.40 |           59.00 |          67.9 |   1.2/5
+   TOTAL |  53/60   |  11/60     |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(4), (15, 16)(13), (16, 3)(5), (3, 3)(11), (4, 15)(15), (9, 10)(12)
+
+  Architecture: v0_9
+    Cost | P3_clean | Full_clean | Mean_P3_ent | Mean_total_cost | Mean_mastered | Flagged
+  ------ | -------- | ---------- | ----------- | --------------- | ------------- | -------
+    0.10 |   7/10   |   1/10     |        2.80 |           13.25 |          72.8 |     N/A
+    0.50 |   9/10   |   5/10     |        1.40 |            3.50 |          73.7 |     N/A
+    1.00 |   9/10   |   2/10     |        1.10 |            8.30 |          75.7 |     N/A
+    2.00 |   8/10   |   3/10     |        1.20 |           17.60 |          72.0 |     N/A
+    5.00 |   8/10   |   3/10     |        2.10 |           46.00 |          76.2 |     N/A
+   10.00 |   8/10   |   2/10     |        0.70 |           98.00 |          68.9 |     N/A
+   TOTAL |  49/60   |  16/60     |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(6), (15, 16)(17), (16, 3)(13), (3, 3)(7), (4, 15)(10), (9, 10)(7)
+
+--- RUN LENGTH: 80000 steps ---
+
+  Architecture: v0_10
+    Cost | P3_clean | Full_clean | Mean_P3_ent | Mean_total_cost | Mean_mastered | Flagged
+  ------ | -------- | ---------- | ----------- | --------------- | ------------- | -------
+    0.10 |   9/10   |   0/10     |        0.90 |            0.82 |         123.5 |   2.6/5
+    0.50 |  10/10   |   1/10     |        0.00 |            3.60 |         115.2 |   1.8/5
+    1.00 |   9/10   |   3/10     |        0.40 |            5.90 |         138.1 |   1.5/5
+    2.00 |  10/10   |   1/10     |        0.20 |           15.40 |         133.5 |   1.7/5
+    5.00 |  10/10   |   2/10     |        0.10 |           31.00 |         135.0 |   1.6/5
+   10.00 |  10/10   |   1/10     |        0.10 |           65.00 |         137.2 |   1.6/5
+   TOTAL |  58/60   |   8/60     |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(2), (15, 16)(11), (16, 3)(12), (3, 3)(14), (4, 15)(16), (9, 10)(5)
+
+  Architecture: v0_9
+    Cost | P3_clean | Full_clean | Mean_P3_ent | Mean_total_cost | Mean_mastered | Flagged
+  ------ | -------- | ---------- | ----------- | --------------- | ------------- | -------
+    0.10 |   4/10   |   0/10     |       17.10 |           23.03 |         144.8 |     N/A
+    0.50 |   8/10   |   2/10     |        1.10 |           11.80 |          98.5 |     N/A
+    1.00 |   6/10   |   1/10     |        5.30 |           25.10 |         115.4 |     N/A
+    2.00 |   7/10   |   0/10     |        9.10 |           47.20 |         146.6 |     N/A
+    5.00 |   6/10   |   0/10     |        3.40 |           99.50 |         135.7 |     N/A
+   10.00 |   7/10   |   1/10     |        3.80 |          156.00 |         129.9 |     N/A
+   TOTAL |  38/60   |   4/60     |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(8), (15, 16)(13), (16, 3)(10), (3, 3)(14), (4, 15)(11), (9, 10)(4)
+
+--- RUN LENGTH: 160000 steps ---
+
+  Architecture: v0_10
+    Cost | P3_clean | Full_clean | Mean_P3_ent | Mean_total_cost | Mean_mastered | Flagged
+  ------ | -------- | ---------- | ----------- | --------------- | ------------- | -------
+    0.10 |  10/10   |   0/10     |        0.10 |            0.88 |         148.3 |   2.9/5
+    0.50 |  10/10   |   0/10     |        0.30 |            4.80 |         155.2 |   2.4/5
+    1.00 |  10/10   |   3/10     |        0.10 |            6.40 |         149.0 |   1.4/5
+    2.00 |  10/10   |   1/10     |        0.00 |           17.80 |         198.4 |   2.4/5
+    5.00 |  10/10   |   1/10     |        0.10 |           43.50 |         171.1 |   2.3/5
+   10.00 |  10/10   |   1/10     |        0.00 |           88.00 |         162.9 |   1.9/5
+   TOTAL |  60/60   |   6/60     |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(4), (15, 16)(11), (16, 3)(6), (3, 3)(18), (4, 15)(15), (9, 10)(6)
+
+  Architecture: v0_9
+    Cost | P3_clean | Full_clean | Mean_P3_ent | Mean_total_cost | Mean_mastered | Flagged
+  ------ | -------- | ---------- | ----------- | --------------- | ------------- | -------
+    0.10 |   8/10   |   2/10     |        2.80 |            9.28 |         146.3 |     N/A
+    0.50 |   7/10   |   0/10     |        2.70 |           15.85 |         165.4 |     N/A
+    1.00 |   6/10   |   0/10     |        3.30 |           23.10 |         183.6 |     N/A
+    2.00 |  10/10   |   1/10     |        0.40 |           34.40 |         180.4 |     N/A
+    5.00 |   8/10   |   0/10     |        2.20 |          147.50 |         175.4 |     N/A
+   10.00 |   9/10   |   1/10     |        1.40 |          217.00 |         151.5 |     N/A
+   TOTAL |  48/60   |   4/60     |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(5), (15, 16)(11), (16, 3)(8), (3, 3)(13), (4, 15)(19), (9, 10)(4)
+
+
+--- v0.10 THREAT-LAYER DYNAMICS ---
+
+Run length 20000:
+  Mean hazards flagged across batch: 1.37/5
+  Distribution: 0 flagged: 16 runs, 1 flagged: 20 runs, 2 flagged: 16 runs, 3 flagged: 5 runs, 5 flagged: 3 runs
+  Mean time to first flag: 5669 steps (min 681, max 18741)
+  Mean total cost incurred: 18.48
+
+Run length 80000:
+  Mean hazards flagged across batch: 1.80/5
+  Distribution: 0 flagged: 11 runs, 1 flagged: 14 runs, 2 flagged: 17 runs, 3 flagged: 13 runs, 4 flagged: 4 runs, 5 flagged: 1 runs
+  Mean time to first flag: 11237 steps (min 439, max 54471)
+  Mean total cost incurred: 20.29
+
+Run length 160000:
+  Mean hazards flagged across batch: 2.22/5
+  Distribution: 0 flagged: 6 runs, 1 flagged: 14 runs, 2 flagged: 16 runs, 3 flagged: 12 runs, 4 flagged: 9 runs, 5 flagged: 3 runs
+  Mean time to first flag: 16990 steps (min 1113, max 149831)
+  Mean total cost incurred: 26.90
+
+
+--- HEADLINE COMPARISON: 160,000-STEP PHASE 3 CLEANNESS ---
+  v0.9  Phase 3 clean: 48/60
+  v0.10 Phase 3 clean: 60/60
+  Improvement: 12 runs (20.0 pp)
+  v0.10 pre-registered category: A — Full stabilisation
