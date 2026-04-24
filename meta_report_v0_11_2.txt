@@ -1,0 +1,150 @@
+============================================================================
+v0.11.2 BATCH META-REPORT
+============================================================================
+Total runs: 360
+Compute time: 7.6 minutes (453s)
+
+
+--- RUN LENGTH: 20000 steps ---
+
+  Architecture: v0_10
+    Cost | P3_clean | Mean_P3_ent | Mean_total_cost | Mean_mast_pairs | Mast_attr | P3_to_mast | P3_to_unmast
+  ------ | -------- | ----------- | --------------- | --------------- | --------- | ---------- | ------------
+    0.10 |   8/10   |        1.10 |            0.59 |            75.2 |       N/A |        N/A |          N/A
+    0.50 |   9/10   |        0.50 |            2.00 |            67.4 |       N/A |        N/A |          N/A
+    1.00 |   9/10   |        0.90 |            3.90 |            75.6 |       N/A |        N/A |          N/A
+    2.00 |  10/10   |        0.70 |           14.20 |            79.3 |       N/A |        N/A |          N/A
+    5.00 |   8/10   |        1.10 |           20.50 |            64.1 |       N/A |        N/A |          N/A
+   10.00 |  10/10   |        0.20 |           51.00 |            75.6 |       N/A |        N/A |          N/A
+   TOTAL |  54/60   |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(4), (15, 16)(13), (16, 3)(13), (3, 3)(8), (4, 15)(14), (9, 10)(8)
+
+  Architecture: v0_11_2
+    Cost | P3_clean | Mean_P3_ent | Mean_total_cost | Mean_mast_pairs | Mast_attr | P3_to_mast | P3_to_unmast
+  ------ | -------- | ----------- | --------------- | --------------- | --------- | ---------- | ------------
+    0.10 |   9/10   |        0.50 |            0.83 |            88.1 |     4.6/6 |        458 |            0
+    0.50 |  10/10   |        0.30 |            2.55 |            80.7 |     4.3/6 |        397 |            0
+    1.00 |   8/10   |        0.90 |            7.60 |            91.4 |     5.0/6 |        345 |            0
+    2.00 |   9/10   |        0.60 |           11.00 |            88.1 |     4.4/6 |        274 |            0
+    5.00 |  10/10   |        0.30 |           29.00 |            83.7 |     4.3/6 |        415 |            0
+   10.00 |   9/10   |        0.60 |           67.00 |            89.3 |     5.1/6 |        244 |            0
+   TOTAL |  55/60   |
+  Distinct top attractors: 4/6
+  Top attractor distribution: (11, 5)(1), (15, 16)(1), (3, 3)(57), (9, 10)(1)
+  Distinct first-banked: 4/6
+  First-banked distribution: (11, 5)(1), (15, 16)(2), (4, 15)(56), (9, 10)(1)
+  Most common mastery sequence accounts for: 6.7% of runs (4/60)
+  Distinct mastery sequences: 47/60
+
+--- RUN LENGTH: 80000 steps ---
+
+  Architecture: v0_10
+    Cost | P3_clean | Mean_P3_ent | Mean_total_cost | Mean_mast_pairs | Mast_attr | P3_to_mast | P3_to_unmast
+  ------ | -------- | ----------- | --------------- | --------------- | --------- | ---------- | ------------
+    0.10 |  10/10   |        0.60 |            0.86 |           150.4 |       N/A |        N/A |          N/A
+    0.50 |  10/10   |        0.20 |            4.10 |           134.0 |       N/A |        N/A |          N/A
+    1.00 |   9/10   |        0.40 |            6.50 |           134.1 |       N/A |        N/A |          N/A
+    2.00 |  10/10   |        0.30 |           15.80 |           139.2 |       N/A |        N/A |          N/A
+    5.00 |  10/10   |        0.20 |           38.50 |           147.4 |       N/A |        N/A |          N/A
+   10.00 |  10/10   |        0.10 |           58.00 |           135.0 |       N/A |        N/A |          N/A
+   TOTAL |  59/60   |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(11), (15, 16)(12), (16, 3)(11), (3, 3)(7), (4, 15)(14), (9, 10)(5)
+
+  Architecture: v0_11_2
+    Cost | P3_clean | Mean_P3_ent | Mean_total_cost | Mean_mast_pairs | Mast_attr | P3_to_mast | P3_to_unmast
+  ------ | -------- | ----------- | --------------- | --------------- | --------- | ---------- | ------------
+    0.10 |  10/10   |        0.40 |            1.12 |           243.2 |     5.5/6 |        439 |            0
+    0.50 |   8/10   |        0.90 |            4.60 |           237.5 |     4.7/6 |        782 |            0
+    1.00 |  10/10   |        0.10 |           10.90 |           230.5 |     5.4/6 |        278 |            0
+    2.00 |   9/10   |        0.90 |           21.60 |           250.8 |     5.6/6 |        471 |            0
+    5.00 |  10/10   |        0.20 |           47.00 |           243.7 |     5.9/6 |        212 |            0
+   10.00 |  10/10   |        0.10 |           99.00 |           239.9 |     5.7/6 |        135 |            0
+   TOTAL |  57/60   |
+  Distinct top attractors: 2/6
+  Top attractor distribution: (3, 3)(59), (4, 15)(1)
+  Distinct first-banked: 5/6
+  First-banked distribution: (11, 5)(2), (15, 16)(1), (3, 3)(2), (4, 15)(49), (9, 10)(6)
+  Most common mastery sequence accounts for: 5.0% of runs (3/60)
+  Distinct mastery sequences: 51/60
+
+--- RUN LENGTH: 160000 steps ---
+
+  Architecture: v0_10
+    Cost | P3_clean | Mean_P3_ent | Mean_total_cost | Mean_mast_pairs | Mast_attr | P3_to_mast | P3_to_unmast
+  ------ | -------- | ----------- | --------------- | --------------- | --------- | ---------- | ------------
+    0.10 |  10/10   |        0.00 |            0.84 |           159.5 |       N/A |        N/A |          N/A
+    0.50 |   9/10   |        0.90 |            5.10 |           202.9 |       N/A |        N/A |          N/A
+    1.00 |  10/10   |        0.10 |            9.20 |           187.0 |       N/A |        N/A |          N/A
+    2.00 |  10/10   |        0.10 |           10.00 |           157.2 |       N/A |        N/A |          N/A
+    5.00 |  10/10   |        0.10 |           34.00 |           145.8 |       N/A |        N/A |          N/A
+   10.00 |  10/10   |        0.30 |          111.00 |           192.5 |       N/A |        N/A |          N/A
+   TOTAL |  59/60   |
+  Distinct top attractors: 6/6
+  Top attractor distribution: (11, 5)(6), (15, 16)(10), (16, 3)(10), (3, 3)(14), (4, 15)(15), (9, 10)(5)
+
+  Architecture: v0_11_2
+    Cost | P3_clean | Mean_P3_ent | Mean_total_cost | Mean_mast_pairs | Mast_attr | P3_to_mast | P3_to_unmast
+  ------ | -------- | ----------- | --------------- | --------------- | --------- | ---------- | ------------
+    0.10 |  10/10   |        0.00 |            1.30 |           437.8 |     5.9/6 |        457 |            0
+    0.50 |  10/10   |        0.10 |            6.70 |           428.9 |     5.8/6 |        721 |            0
+    1.00 |  10/10   |        0.00 |           13.40 |           423.9 |     5.8/6 |        431 |            0
+    2.00 |  10/10   |        0.20 |           27.40 |           426.6 |     5.9/6 |        153 |            0
+    5.00 |  10/10   |        0.10 |           68.50 |           431.6 |     6.0/6 |        384 |            0
+   10.00 |   8/10   |        0.60 |          123.00 |           440.5 |     5.8/6 |        474 |            0
+   TOTAL |  58/60   |
+  Distinct top attractors: 1/6
+  Top attractor distribution: (3, 3)(60)
+  Distinct first-banked: 5/6
+  First-banked distribution: (11, 5)(1), (15, 16)(3), (3, 3)(2), (4, 15)(47), (9, 10)(7)
+  Most common mastery sequence accounts for: 10.0% of runs (6/60)
+  Distinct mastery sequences: 42/60
+
+
+--- v0.11.2 MASTERY DYNAMICS SUMMARY ---
+
+Run length 20000:
+  Mean attractors mastered: 4.62/6
+  Distribution: 1 mastered: 1 runs, 2 mastered: 3 runs, 3 mastered: 8 runs, 4 mastered: 7 runs, 5 mastered: 28 runs, 6 mastered: 13 runs
+  Mean post-mastery visits (sum across mastered): 1096
+  Mean P3 visits to mastered attractors: 355.4
+  Mean P3 visits to unmastered attractors: 0.1
+  Mean time to first mastery: 514 steps (min 338, max 1590)
+  Mean time to final mastery: 8333 steps (min 638, max 19783)
+
+Run length 80000:
+  Mean attractors mastered: 5.47/6
+  Distribution: 2 mastered: 1 runs, 3 mastered: 2 runs, 4 mastered: 4 runs, 5 mastered: 14 runs, 6 mastered: 39 runs
+  Mean post-mastery visits (sum across mastered): 2636
+  Mean P3 visits to mastered attractors: 386.1
+  Mean P3 visits to unmastered attractors: 0.0
+  Mean time to first mastery: 786 steps (min 338, max 5285)
+  Mean time to final mastery: 23599 steps (min 1764, max 54846)
+
+Run length 160000:
+  Mean attractors mastered: 5.87/6
+  Distribution: 4 mastered: 1 runs, 5 mastered: 6 runs, 6 mastered: 53 runs
+  Mean post-mastery visits (sum across mastered): 4399
+  Mean P3 visits to mastered attractors: 436.7
+  Mean P3 visits to unmastered attractors: 0.0
+  Mean time to first mastery: 652 steps (min 338, max 2228)
+  Mean time to final mastery: 36839 steps (min 3860, max 107083)
+
+
+--- HEADLINE COMPARISON: 160,000-STEP RESULTS ---
+  Phase 3 cleanness:
+    v0.10:   59/60
+    v0.11.2: 58/60
+  Behavioural preservation check: rule adherence PRESERVED
+
+  v0.11.2 mean attractors mastered at 160k: 5.87/6
+
+  v0.11 PRE-REGISTERED CATEGORY ASSESSMENT:
+  CATEGORY A — Full mastery trajectory (mean 5.87 >= 5.0)
+
+  CATEGORY F (INDIVIDUATION COLLAPSE) ASSESSMENT at 160k:
+    Signal 1 (first-banked < 4 distinct): 5/6 distinct - NOT triggered
+    Signal 2 (dominant sequence > 40%): 10.0% - NOT triggered
+    Signal 3 (rank vs distance Pearson r > 0.7): -0.076 - NOT triggered
+    Category F: NOT triggered (0/3 signals)
