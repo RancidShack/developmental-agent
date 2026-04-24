@@ -1,0 +1,231 @@
+========================================================================
+v0.11.2 CHARACTERISATION
+                  hazard_cost         = 1.0
+                  flag_threshold      = 3
+                  mastery_threshold   = 3
+                  mastery_bonus       = 1.0
+========================================================================
+Life length              : 20000 steps
+Environment size         : 20x20
+Passable scope           : 319
+Hazard cells             : 5
+Attractor cells          : 6
+
+Phase 1 (Prescribed traversal):
+  Completed at step      : 331
+  Cells covered          : 318/319
+  Path length            : 331 actions
+
+Phase 2 (Integration): 11669 steps
+  Attractor visit ratio  : 2.62x chance
+  Attention CV           : 2.09
+
+Phase 3 (Autonomy): 8000 steps
+  Attractor visit ratio  : 0.07x chance
+  Attention CV           : 3.80
+  Attention concentration: 79.0x uniform
+  P3 visits to mastered  : 10
+  P3 visits to unmastered: 0
+
+MASTERY LAYER (v0.11):
+  Attractors mastered      : 6/6
+  Time to first mastery    : 457
+  Time to final mastery    : 19468
+  Mastery order sequence   :
+    1. (3, 3)
+    2. (11, 5)
+    3. (16, 3)
+    4. (15, 16)
+    5. (9, 10)
+    6. (4, 15)
+  Per-attractor visit counts:
+    (3, 3): 265 [MASTERED]
+    (4, 15): 8 [MASTERED]
+    (9, 10): 25 [MASTERED]
+    (11, 5): 259 [MASTERED]
+    (15, 16): 25 [MASTERED]
+    (16, 3): 8 [MASTERED]
+
+THREAT LAYER (v0.10, inherited):
+  Hazards flagged          : 3/5
+  Time to first flag       : 6676
+  Time to final flag       : 11235
+  Actions gated by layer   — P2: 4218  P3: 5059
+
+RULE ADHERENCE:
+  Frame-directed blocked attempts  — P1:    0  P2:    0  P3:    0
+  Actual hazard entries            — P1:    0  P2:   10  P3:    1
+  Total cost incurred              : 11.00
+
+Total state-action pairs mastered  : 77
+
+Top 5 preferred cells at end of life:
+  (15, 13): preference = 19.55
+  (18, 9): preference = 19.31
+  (17, 9): preference = 17.05
+  (16, 13): preference = 13.64
+  (15, 12): preference = 13.58
+
+========================================================================
+DIAGNOSTIC DUMP — POST-MASTERY FIXATION MECHANISM
+========================================================================
+
+Mastered attractors at end of run: 6/6
+  (3, 3): total visits = 265, P3 visits = 0
+  (16, 3): total visits = 8, P3 visits = 0
+  (9, 10): total visits = 25, P3 visits = 0
+  (4, 15): total visits = 8, P3 visits = 7
+  (15, 16): total visits = 25, P3 visits = 3
+  (11, 5): total visits = 259, P3 visits = 0
+
+--- H1: Preference accumulation on neighbour cells ---
+(Preference values for cells within Manhattan distance 2 of each
+ mastered attractor. If neighbour preferences are substantial,
+ they could pull the agent back via Phase 3 preference-weighting.)
+
+Neighbourhood of mastered attractor (3, 3):
+    (3, 2) (d=1, NEUT): preference = 0.00
+    (3, 4) (d=1, NEUT): preference = 0.85
+    (2, 3) (d=1, NEUT): preference = 0.00
+    (4, 3) (d=1, NEUT): preference = 6.73
+    (2, 2) (d=2, NEUT): preference = 0.83
+    (2, 4) (d=2, NEUT): preference = 0.00
+    (4, 2) (d=2, NEUT): preference = 0.00
+    (4, 4) (d=2, NEUT): preference = 0.00
+    (3, 1) (d=2, NEUT): preference = 0.00
+    (3, 5) (d=2, NEUT): preference = 0.00
+    (1, 3) (d=2, NEUT): preference = 0.00
+    (5, 3) (d=2, NEUT): preference = 0.00
+
+Neighbourhood of mastered attractor (16, 3):
+    (16, 2) (d=1, NEUT): preference = 0.00
+    (16, 4) (d=1, NEUT): preference = 0.00
+    (15, 3) (d=1, NEUT): preference = 0.00
+    (17, 3) (d=1, NEUT): preference = 0.00
+    (15, 2) (d=2, NEUT): preference = 0.00
+    (15, 4) (d=2, NEUT): preference = 0.00
+    (17, 2) (d=2, NEUT): preference = 0.00
+    (17, 4) (d=2, NEUT): preference = 0.00
+    (16, 1) (d=2, NEUT): preference = 0.00
+    (16, 5) (d=2, NEUT): preference = 0.00
+    (14, 3) (d=2, NEUT): preference = 0.00
+    (18, 3) (d=2, NEUT): preference = 0.00
+
+Neighbourhood of mastered attractor (9, 10):
+    (9, 9) (d=1, NEUT): preference = 0.00
+    (9, 11) (d=1, NEUT): preference = 0.00
+    (8, 10) (d=1, NEUT): preference = 2.34
+    (10, 10) (d=1, NEUT): preference = 0.00
+    (8, 9) (d=2, NEUT): preference = 0.00
+    (8, 11) (d=2, NEUT): preference = 0.00
+    (10, 9) (d=2, NEUT): preference = 0.00
+    (10, 11) (d=2, NEUT): preference = 0.00
+    (9, 8) (d=2, NEUT): preference = 0.00
+    (9, 12) (d=2, NEUT): preference = 0.00
+    (7, 10) (d=2, NEUT): preference = 0.00
+    (11, 10) (d=2, NEUT): preference = 0.00
+
+Neighbourhood of mastered attractor (4, 15):
+    (4, 14) (d=1, NEUT): preference = 0.00
+    (4, 16) (d=1, NEUT): preference = 0.00
+    (3, 15) (d=1, NEUT): preference = 0.00
+    (5, 15) (d=1, NEUT): preference = 0.00
+    (3, 14) (d=2, NEUT): preference = 0.00
+    (3, 16) (d=2, NEUT): preference = 0.00
+    (5, 14) (d=2, NEUT): preference = 0.32
+    (5, 16) (d=2, NEUT): preference = 0.00
+    (4, 13) (d=2, NEUT): preference = 0.16
+    (4, 17) (d=2, NEUT): preference = 0.00
+    (2, 15) (d=2, NEUT): preference = 0.00
+    (6, 15) (d=2, NEUT): preference = 0.00
+
+Neighbourhood of mastered attractor (15, 16):
+    (15, 15) (d=1, NEUT): preference = 7.95
+    (15, 17) (d=1, NEUT): preference = 0.16
+    (14, 16) (d=1, NEUT): preference = 0.00
+    (16, 16) (d=1, NEUT): preference = 0.64
+    (14, 15) (d=2, NEUT): preference = 0.00
+    (14, 17) (d=2, NEUT): preference = 0.00
+    (16, 15) (d=2, NEUT): preference = 0.16
+    (16, 17) (d=2, NEUT): preference = 1.41
+    (15, 14) (d=2, NEUT): preference = 12.48
+    (15, 18) (d=2, NEUT): preference = 7.76
+    (13, 16) (d=2, NEUT): preference = 6.08
+    (17, 16) (d=2, NEUT): preference = 0.00
+
+Neighbourhood of mastered attractor (11, 5):
+    (11, 4) (d=1, NEUT): preference = 0.00
+    (11, 6) (d=1, NEUT): preference = 0.00
+    (10, 5) (d=1, NEUT): preference = 0.00
+    (12, 5) (d=1, NEUT): preference = 12.57
+    (10, 4) (d=2, NEUT): preference = 0.00
+    (10, 6) (d=2, NEUT): preference = 0.00
+    (12, 4) (d=2, NEUT): preference = 0.00
+    (12, 6) (d=2, NEUT): preference = 0.16
+    (11, 3) (d=2, NEUT): preference = 0.00
+    (11, 7) (d=2, NEUT): preference = 0.00
+    (9, 5) (d=2, NEUT): preference = 0.00
+    (13, 5) (d=2, NEUT): preference = 7.60
+
+H1 SUMMARY:
+  Mean preference on NEUTRAL cells within d=2 of mastered: 0.95
+  Max preference on NEUTRAL cells within d=2 of mastered:  12.57
+  Mean preference on NEUTRAL cells far (>d=2) from mastered: 1.84
+  Ratio near/far: 0.52x
+
+--- H2: Q-values for actions LEADING INTO mastered attractors ---
+(Q-values for state-action pairs where the action targets a
+ mastered attractor cell. If these are substantial and positive,
+ they reinforce the path toward the mastered cell despite the
+ cell itself producing no signal.)
+
+Q-values for actions targeting (3, 3):
+    From (3, 4) (NEUT, action 0): max Q = 0.169, mean Q = 0.169, n_states = 1
+    From (3, 2) (NEUT, action 1): max Q = 0.000, mean Q = 0.000, n_states = 1
+    From (4, 3) (NEUT, action 2): max Q = 0.097, mean Q = 0.097, n_states = 1
+    From (2, 3) (NEUT, action 3): max Q = 0.000, mean Q = 0.000, n_states = 1
+
+Q-values for actions targeting (16, 3):
+    From (16, 4) (NEUT, action 0): max Q = 0.000, mean Q = 0.000, n_states = 1
+    From (15, 3) (NEUT, action 3): max Q = 0.052, mean Q = 0.052, n_states = 1
+
+Q-values for actions targeting (9, 10):
+    From (9, 11) (NEUT, action 0): max Q = 0.011, mean Q = 0.011, n_states = 1
+    From (9, 9) (NEUT, action 1): max Q = 0.000, mean Q = 0.000, n_states = 1
+    From (10, 10) (NEUT, action 2): max Q = 0.000, mean Q = 0.000, n_states = 1
+    From (8, 10) (NEUT, action 3): max Q = 0.141, mean Q = 0.141, n_states = 1
+
+Q-values for actions targeting (4, 15):
+    From (4, 16) (NEUT, action 0): max Q = 0.017, mean Q = 0.017, n_states = 1
+    From (4, 14) (NEUT, action 1): max Q = 0.000, mean Q = 0.000, n_states = 1
+    From (5, 15) (NEUT, action 2): max Q = 0.166, mean Q = 0.166, n_states = 1
+    From (3, 15) (NEUT, action 3): max Q = 0.000, mean Q = 0.000, n_states = 1
+
+Q-values for actions targeting (15, 16):
+    From (15, 17) (NEUT, action 0): max Q = 0.006, mean Q = 0.006, n_states = 1
+    From (15, 15) (NEUT, action 1): max Q = 0.008, mean Q = 0.008, n_states = 1
+    From (16, 16) (NEUT, action 2): max Q = 2.435, mean Q = 2.435, n_states = 1
+    From (14, 16) (NEUT, action 3): max Q = 0.000, mean Q = 0.000, n_states = 1
+
+Q-values for actions targeting (11, 5):
+    From (11, 6) (NEUT, action 0): max Q = 0.000, mean Q = 0.000, n_states = 1
+    From (11, 4) (NEUT, action 1): max Q = 0.000, mean Q = 0.000, n_states = 1
+    From (12, 5) (NEUT, action 2): max Q = 0.097, mean Q = 0.097, n_states = 1
+    From (10, 5) (NEUT, action 3): max Q = 0.107, mean Q = 0.107, n_states = 1
+
+H2 SUMMARY:
+  Mean Q-value for actions targeting mastered attractors: 0.150
+  Max Q-value for actions targeting mastered attractors: 2.435
+  Mean Q-value for other actions: 3.822
+  Max Q-value for other actions: 129.450
+  Ratio (into-mastered / other) means: 0.04x
+
+--- INTERPRETATION GUIDE ---
+If H1 SUMMARY shows neighbour pref much higher than far pref,
+  then preference accumulation on neighbour cells is driving
+  fixation (preferences pull agent into neighbourhood).
+If H2 SUMMARY shows into-mastered Q-values much higher than
+  other Q-values, then Q-value learning is reinforcing paths
+  toward mastered cells (Q-values pull agent directly to cell).
+If both, both mechanisms are active. If neither is strongly
+  elevated, the mechanism is something else not yet identified.
