@@ -1,0 +1,66 @@
+========================================================================
+v0.11.2 CHARACTERISATION
+                  hazard_cost         = 1.0
+                  flag_threshold      = 3
+                  mastery_threshold   = 3
+                  mastery_bonus       = 1.0
+========================================================================
+Life length              : 20000 steps
+Environment size         : 20x20
+Passable scope           : 319
+Hazard cells             : 5
+Attractor cells          : 6
+
+Phase 1 (Prescribed traversal):
+  Completed at step      : 331
+  Cells covered          : 318/319
+  Path length            : 331 actions
+
+Phase 2 (Integration): 11669 steps
+  Attractor visit ratio  : 6.59x chance
+  Attention CV           : 2.19
+
+Phase 3 (Autonomy): 8000 steps
+  Attractor visit ratio  : 0.78x chance
+  Attention CV           : 2.17
+  Attention concentration: 36.3x uniform
+  P3 visits to mastered  : 117
+  P3 visits to unmastered: 0
+
+MASTERY LAYER (v0.11):
+  Attractors mastered      : 5/6
+  Time to first mastery    : 346
+  Time to final mastery    : 7708
+  Mastery order sequence   :
+    1. (4, 15)
+    2. (9, 10)
+    3. (3, 3)
+    4. (11, 5)
+    5. (16, 3)
+  Per-attractor visit counts:
+    (3, 3): 261 [MASTERED]
+    (4, 15): 7 [MASTERED]
+    (9, 10): 888 [MASTERED]
+    (11, 5): 349 [MASTERED]
+    (15, 16): 1
+    (16, 3): 63 [MASTERED]
+
+THREAT LAYER (v0.10, inherited):
+  Hazards flagged          : 1/5
+  Time to first flag       : 9368
+  Time to final flag       : 9368
+  Actions gated by layer   — P2: 1110  P3: 1156
+
+RULE ADHERENCE:
+  Frame-directed blocked attempts  — P1:    0  P2:    0  P3:    0
+  Actual hazard entries            — P1:    0  P2:    5  P3:    1
+  Total cost incurred              : 6.00
+
+Total state-action pairs mastered  : 80
+
+Top 5 preferred cells at end of life:
+  (2, 3): preference = 19.51 (near attractor)
+  (3, 6): preference = 15.74
+  (9, 9): preference = 14.88 (near attractor)
+  (3, 5): preference = 14.17
+  (2, 2): preference = 13.90
