@@ -278,26 +278,38 @@ def path_to_actions(path):
 # --------------------------------------------------------------------------
 
 class DevelopmentalAgent:
-    """v0.11.2 amendment to v0.11.1. Adds one architectural change
-    relative to v0.11.1: preference accumulation in update_model is
-    blocked entirely on mastered cells. The v0.11.1 reset at banking
-    is retained for architectural clarity but is now redundant.
+    """v0.12 extension of v0.11.2. Adds one architectural change
+    relative to v0.11.2: the threat layer's flag-conversion rule
+    is augmented with a category-membership check on cell-type
+    signature (signature-matching first-entry flagging on signature
+    match). All v0.11.2 mastery-side architecture is preserved.
 
-    Inherits from v0.11/v0.11.1:
-      - attractor_visit_counter: per-cell int counter for ATTRACTOR entries
-      - mastery_flag: per-cell binary flag (ATTRACTORs only)
-      - Modified feature_reward: returns full FEATURE_DRIVE_WEIGHT for
-        visits 1 to N-1, MASTERY_BONUS on visit N (banking), 0 after.
+    Inherits from v0.11.2 (which inherits v0.11.1, v0.11, v0.10):
+      - threat_flag: per-cell binary flag (FRAME pre-flagged, others
+        initialised to 0)
+      - hazard_entry_counter: per-cell int counter for HAZARD entries
+      - Three-entry conversion rule: a cell flagged once its counter
+        reaches FLAG_THRESHOLD = 3 (retained as the path for the
+        first hazard cell flagged in any run)
+      - Hard-gate action selection: flagged cells excluded from the
+        action-selection pipeline before Q-value computation
+      - attractor_visit_counter, mastery_flag, MASTERY_THRESHOLD = 3,
+        MASTERY_BONUS = 1.0
+      - Modified feature_reward: full FEATURE_DRIVE_WEIGHT for visits
+        1 to N-1, MASTERY_BONUS on visit N (banking), 0 after
       - Modified _primitive_bias: ATTRACTION_BONUS cleared for banked
-        attractors so the agent's exploration extends outward.
+        attractors
       - update_model resets cell_preference at the banking step (v0.11.1)
+        and blocks preference accumulation entirely on mastered cells
+        (v0.11.2)
 
-    v0.11.2 additions:
-      - update_model blocks cell_preference accumulation entirely on
-        mastered cells. Combined with the v0.11/v0.11.1 changes, a
-        mastered cell produces no signal pulling the agent back via
-        any of the four mechanisms (feature reward, attraction bias,
-        preference at banking, preference accumulation post-banking).
+    v0.12 addition:
+      - update_threat_layer applies a category-membership check before
+        the standard three-entry conversion. If any other hazard cell
+        has threat_flag = 1, the entered cell's flag is set to 1
+        immediately on this entry (signature-matching first-entry
+        conversion). If no other hazard is flagged, the standard
+        three-entry conversion rule applies as in v0.11.2.
     """
 
     def __init__(self, world, total_steps, num_actions=4):
@@ -690,7 +702,7 @@ def run():
     world = StructuredGridWorld()
     agent = DevelopmentalAgent(world, NUM_STEPS)
 
-    print(f"v0.11.2 single run")
+    print(f"v0.12 single run")
     print(f"  HAZARD_COST         : {HAZARD_COST}")
     print(f"  FLAG_THRESHOLD      : {FLAG_THRESHOLD}")
     print(f"  MASTERY_THRESHOLD   : {MASTERY_THRESHOLD}")
@@ -800,7 +812,7 @@ def run():
     # --- REPORT ---
     lines = []
     lines.append("=" * 72)
-    lines.append(f"v0.11.2 CHARACTERISATION")
+    lines.append(f"v0.12 CHARACTERISATION")
     lines.append(f"                  hazard_cost         = {HAZARD_COST}")
     lines.append(f"                  flag_threshold      = {FLAG_THRESHOLD}")
     lines.append(f"                  mastery_threshold   = {MASTERY_THRESHOLD}")
