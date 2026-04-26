@@ -1,0 +1,79 @@
+============================================================================
+v0.13 BATCH META-REPORT (regenerated under v0.13.1 amendment)
+============================================================================
+v0.13 runs:  180
+v0.12 baseline: 180 runs
+Activated runs: 97
+Non-activated runs: 83
+
+--- v0.13 END-STATE FINDINGS (HEADLINE) ---
+
+Run length 20000:
+  Activation rate: 13/60 (21.7%)
+  Discovery rate:  6/60 (10.0%)
+  Conditional discovery (given activation): 6/13 (46.2%)
+  Activation step: mean 9550 (min 4434, max 19895, n=13)
+  Post-activation window: mean 10450 (min 105, max 15566)
+  Discovery time: mean 1036 (min 2, max 2744, n=6)
+
+Run length 80000:
+  Activation rate: 35/60 (58.3%)
+  Discovery rate:  29/60 (48.3%)
+  Conditional discovery (given activation): 29/35 (82.9%)
+  Activation step: mean 23832 (min 6234, max 51986, n=35)
+  Post-activation window: mean 56168 (min 28014, max 73766)
+  Discovery time: mean 3395 (min 2, max 14343, n=29)
+
+Run length 160000:
+  Activation rate: 49/60 (81.7%)
+  Discovery rate:  46/60 (76.7%)
+  Conditional discovery (given activation): 46/49 (93.9%)
+  Activation step: mean 36918 (min 4176, max 107605, n=49)
+  Post-activation window: mean 123082 (min 52395, max 155824)
+  Discovery time: mean 5700 (min 2, max 46615, n=46)
+
+
+--- v0.13 CHECK 4a: PRE-ACTIVATION PRESERVATION ---
+(Restricted to non-activated runs per v0.13.1 amendment)
+  Non-activated runs audited: 83
+  Byte-identical to v0.12 baseline: 83/83 (100.0%)
+  CHECK 4a PASS: byte-identical preservation holds
+  across all 83 non-activated matched-seed runs.
+
+
+--- v0.13 CHECK 4b: POST-ACTIVATION CROSS-LAYER EFFECT ---
+(Characterisation of activated runs per v0.13.1 amendment)
+  Activated runs audited: 97
+  Divergent from v0.12 baseline: 48/97 (49.5%)
+  Divergence category breakdown:
+    Threat-layer fields only:  48 runs
+    Mastery-layer fields only: 0 runs
+    Both threat and mastery:   0 runs
+  Field-level divergence (top fields):
+    time_to_final_flag: 48 runs
+    hazard_entries_p2: 29 runs
+    hazards_flagged: 28 runs
+    first_entry_conversions: 27 runs
+    time_to_second_flag: 14 runs
+    time_to_first_flag: 11 runs
+  Direction of divergence:
+    hazards_flagged: v0.13 higher in 17, v0.12 higher in 11
+    hazard_entries_p2: v0.13 higher in 16, v0.12 higher in 13
+    first_entry_conversions: v0.13 higher in 17, v0.12 higher in 10
+
+  Mastery dynamics are byte-identical to v0.12 in all
+  97 activated runs. Category E NOT triggered.
+
+
+--- v0.13 PRE-REGISTERED CATEGORY ASSESSMENT ---
+  Check (discovery rate >= 30/60 at 20000 steps): 6/60 - FAIL
+  Check (discovery rate >= 50/60 at 80000 steps): 29/60 - FAIL
+  Check (discovery rate >= 55/60 at 160000 steps): 46/60 - FAIL
+  Check 4a (byte-identical, non-activated runs): 83/83 - PASS
+
+  CATEGORY A NOT MET
+    Failed: discovery rate at run length(s) [20000, 80000, 160000]
+
+  CATEGORY F (HONESTY CONSTRAINT) — applies regardless of
+  the operational result. The locating capability operates
+  through inherited v0.11.2 / v0.12 Phase 3 dynamics.
