@@ -1,0 +1,85 @@
+========================================================================
+v0.14 META-REPORT
+Competency-gated content transformation of hazard cells into knowledge cells
+========================================================================
+
+Total runs: 180
+Cost levels: [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+Run lengths: [20000, 80000, 160000]
+
+========================================================================
+KNOWLEDGE LAYER (v0.14)
+========================================================================
+
+Run length: 20000
+  Runs                          : 60
+  Mean hazards transitioned     : 4.45 of 5
+  Mean hazards banked as kn.    : 3.67 of 5
+  Runs with all 5 transitioned  : 40/60
+  Runs with all 5 banked        : 26/60
+  End-state activated (v0.14)   : 17/60
+  End-state found post-activation: 10/60
+  Conditional discovery rate    : 58.8%
+  Post-transition first-entry rate (per cell):
+    221/267 (82.8%)
+
+Run length: 80000
+  Runs                          : 60
+  Mean hazards transitioned     : 4.92 of 5
+  Mean hazards banked as kn.    : 4.73 of 5
+  Runs with all 5 transitioned  : 55/60
+  Runs with all 5 banked        : 51/60
+  End-state activated (v0.14)   : 45/60
+  End-state found post-activation: 39/60
+  Conditional discovery rate    : 86.7%
+  Post-transition first-entry rate (per cell):
+    285/295 (96.6%)
+
+Run length: 160000
+  Runs                          : 60
+  Mean hazards transitioned     : 5.00 of 5
+  Mean hazards banked as kn.    : 4.95 of 5
+  Runs with all 5 transitioned  : 60/60
+  Runs with all 5 banked        : 59/60
+  End-state activated (v0.14)   : 53/60
+  End-state found post-activation: 51/60
+  Conditional discovery rate    : 96.2%
+  Post-transition first-entry rate (per cell):
+    297/300 (99.0%)
+
+
+--- v0.14 CHECK 4a: PRE-FIRST-TRANSITION PRESERVATION ---
+(Behaviour up to first attractor banking matches v0.13)
+  Runs audited: 180
+  Byte-identical to v0.13 baseline (pre-first-transition fields):
+    180/180 (100.0%)
+  CHECK 4a PASS: byte-identical preservation holds
+  across all 180 matched-seed runs in the
+  pre-first-transition window.
+
+
+--- v0.14 CHECK 4b: CROSS-LAYER EFFECT AUDITS ---
+(Three pre-registered hypotheses; characterisation only)
+
+  Hypothesis 1: competency-unlock affects threat-side encounter
+  Fields audited: hazards_flagged, time_to_final_flag
+    Activated runs audited: 180
+    hazards_flagged: divergent in 164/180 (91.1%); v14 higher in 10, v13 higher in 154
+    time_to_final_flag: divergent in 169/180 (93.9%); v14 higher in 6, v13 higher in 95
+
+  Hypothesis 2: knowledge-cell engagement affects subsequent mastery
+  Fields audited: time_to_final_mastery, attractors_mastered
+    Activated runs audited: 180
+    time_to_final_mastery: divergent in 169/180 (93.9%); v14 higher in 81, v13 higher in 88
+    attractors_mastered: divergent in 78/180 (43.3%); v14 higher in 49, v13 higher in 29
+
+  Hypothesis 3: end-state activation timing affects full-run cleanness
+  Fields audited: activation_step, end_state_found_step, hazard_entries_p3
+    Both-activated runs audited: 76
+    activation_step: divergent in 76/76 (100.0%)
+    end_state_found_step: divergent in 74/76 (97.4%)
+    hazard_entries_p3: divergent in 5/76 (6.6%)
+
+========================================================================
+End of v0.14 meta-report
+========================================================================
