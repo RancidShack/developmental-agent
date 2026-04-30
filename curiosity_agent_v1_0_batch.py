@@ -336,6 +336,17 @@ def main():
                           "output is bit-for-bit identical to the v0.14 "
                           "batch. Used to verify instrumentation does "
                           "not affect agent behaviour."))
+    ap.add_argument("--seed-from-baseline-steps", type=int, default=None,
+                    help=("If set, pull seeds from the baseline at this "
+                          "num_steps value, ignoring the --steps argument "
+                          "for seed matching. Used by the v1.0.2 extended "
+                          "batch (Baker, 2026r) where target run length "
+                          "(e.g. 320000) differs from the baseline's "
+                          "available run lengths (20000, 80000, 160000). "
+                          "Matched-seed comparability holds because the "
+                          "agent's seed and pre-target-step trajectory "
+                          "are identical to the baseline run at "
+                          "(cost, baseline_steps, run_idx)."))
     args = ap.parse_args()
 
     instrument = not args.no_instrument
@@ -359,7 +370,14 @@ def main():
     for steps in args.steps:
         for cost in args.cost:
             for run_idx in range(args.runs):
-                key = (cost, steps, run_idx)
+                # Determine which baseline (cost, steps, run_idx) to
+                # pull the seed from. By default, match the run's own
+                # num_steps; if --seed-from-baseline-steps is set, use
+                # that instead (for the v1.0.2 extended batch).
+                lookup_steps = (args.seed_from_baseline_steps
+                                if args.seed_from_baseline_steps is not None
+                                else steps)
+                key = (cost, lookup_steps, run_idx)
                 if key not in baseline_seeds:
                     continue
                 seed = baseline_seeds[key]
