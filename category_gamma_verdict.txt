@@ -1,0 +1,45 @@
+v1.1 CATEGORY γ VERDICT
+======================================================================
+
+Pairwise distances computed: 16110
+  within-cell pairs:   810
+  across-cell pairs:   15300
+
+d_across_cells: mean=0.4792 std=0.1472
+
+Per-cell within-cell statistics:
+    cost    steps    n     mean      std      min      max
+     0.1    20000   45   0.5258   0.1087   0.2289   0.7093
+     0.1    80000   45   0.4724   0.1015   0.1337   0.6159
+     0.1   160000   45   0.4796   0.1113   0.1779   0.6488
+     0.5    20000   45   0.4406   0.1655   0.1326   0.7639
+     0.5    80000   45   0.3630   0.1559   0.1182   0.5995
+     0.5   160000   45   0.4427   0.0840   0.1573   0.5547
+     1.0    20000   45   0.3197   0.1237   0.0900   0.6000
+     1.0    80000   45   0.5060   0.1084   0.1776   0.7285
+     1.0   160000   45   0.4699   0.1080   0.1647   0.6421
+     2.0    20000   45   0.4276   0.1718   0.0722   0.6875
+     2.0    80000   45   0.4483   0.1723   0.1164   0.7178
+     2.0   160000   45   0.4561   0.1037   0.1547   0.6431
+     5.0    20000   45   0.4702   0.1691   0.1748   0.8722
+     5.0    80000   45   0.4813   0.1485   0.1436   0.6769
+     5.0   160000   45   0.4385   0.1378   0.1241   0.6290
+    10.0    20000   45   0.3715   0.1351   0.1554   0.7010
+    10.0    80000   45   0.4900   0.1243   0.1486   0.6628
+    10.0   160000   45   0.4592   0.1279   0.1268   0.6570
+
+v1.1.1 amendment §5 criteria:
+
+  Criterion 1 (d_within_cell >= 0.05 AND d_across_cells > d_within_cell):
+    cells passing:                  13 / 18
+    cells meeting floor:            18 / 18
+    cells with d_across > d_within: 13 / 18
+
+  Criterion 2 (std >= 0.02 in at least 4 cells):
+    cells with std >= 0.02:       18 / 18
+    Criterion 2 verdict:            PASS
+
+OVERALL CATEGORY γ VERDICT: PARTIAL PASS
+
+Per v1.1 pre-registration §5.3 and v1.1.1 amendment §6: negative findings are honestly reported. The v1.1 paper's Category γ section reads against the actual distribution rather than against threshold-pass framing.
+
