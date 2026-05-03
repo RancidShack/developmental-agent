@@ -1,490 +1,340 @@
 """
 v1_2_schema.py
 --------------
-v1.2 schema phase — parallel observer module.
+v1.2 schema observer. Reconstructed for v1.7 from the v1.3 schema
+extension's interface requirements and the v1.2 paper's Table 1
+cell-type property matrix.
 
-Implements SICC Commitment 1 (schema as embodied a priori): the agent
-acquires an explicit representation of the categorical structure of its
-environment — cell types as kinds, actions as available verbs, phases
-as developmental periods, flag types as formation categories — held as
-an inspectable structure from construction time.
+Provides:
+    V12Agent          — subclasses V014Agent, adds query_schema callable
+    V12SchemaObserver — parallel observer; builds schema at init,
+                        populates self._row at on_run_end
+    SCHEMA_FIELDS     — ordered field list for schema CSV
 
-The schema is given, not learned. It does not drive the agent's
-action-selection pipeline, drive composition, model updates, or any
-other behavioural pathway. The agent can call query_schema() to examine
-the schema; calling it produces no side effects and alters no state.
+The schema describes the architecture's structure: cell types, action
+vocabulary, phase schedule, flag types. It is a property of the
+architecture (fixed at run start), not of the run.
 
-Implementation pattern: parallel observer, identical to v1_1_provenance.py.
-The v0.14 agent and world are unmodified. The agent subclass V12Agent
-adds _build_schema() and query_schema() at construction time without
-touching any inherited method. The schema observer V12SchemaObserver
-reads the agent's schema at on_run_end() and writes it to schema_v1_2.csv.
-With the observer either disabled or absent, the batch produces v1.1-
-baseline-identical output at matched seeds (permanent regression test).
+V12Agent adds query_schema(section) to the agent namespace. V13Agent
+subclasses this and extends the cell_type_schema with COLOUR_CELL.
 
-Schema structure
-----------------
-Four sub-schemas, each a dict keyed by category name:
+SCHEMA STRUCTURE (v1.2 paper §2.2)
+  cell_types: {name: {code, passable, cost_on_entry,
+                       feature_reward_eligible, attraction_bias_eligible,
+                       gating_eligible, transformation_eligible}}
+  actions:    {name: {code, description}}
+  phases:     {name: {code, description, novelty_weight, progress_weight,
+                       preference_weight, feature_weight}}
+  flag_types: {name: {formation_condition, formation_threshold,
+                       confirming_operationalisation,
+                       disconfirming_semantics, applicable_cell_types}}
 
-  cell_type_schema  — FRAME, NEUTRAL, HAZARD, ATTRACTOR, END_STATE,
-                      KNOWLEDGE with architectural property fields.
-  action_schema     — UP, DOWN, LEFT, RIGHT with (dx, dy) offset pairs.
-  phase_schema      — PHASE_1, PHASE_2, PHASE_3 with drive compositions
-                      and transition conditions.
-  flag_type_schema  — THREAT, MASTERY, KNOWLEDGE_BANKING, END_STATE
-                      with formation conditions and confirming/
-                      disconfirming operationalisations.
-
-Public interface
-----------------
-V12Agent.query_schema(domain, key=None)
-    domain: 'cell_types' | 'actions' | 'phases' | 'flag_types'
-    key:    optional string to retrieve a single entry; if None, the
-            full sub-schema dict is returned.
-    Returns a copy of the requested schema structure (no aliasing).
-
-V12SchemaObserver(agent, world, run_metadata, cell_type_constants)
-    Parallel observer. Call on_run_end(step) once at end of each run.
-    Call write_schema_csv(path, append=True) to persist.
-    Call reset() between runs.
-
-CSV outputs
------------
-schema_v1_2.csv  — one row per run, schema field values.
+CELL TYPE PROPERTIES (Table 1 from v1.2 paper)
+                        passable  cost  feat  attr  gate  transf
+  FRAME                 False     N/A   False False False False
+  NEUTRAL               True      0     False False False False
+  HAZARD                True      >0    False False True  True
+  ATTRACTOR             True      0     True  True  False False
+  END_STATE             True      0     True  True  True  False
+  KNOWLEDGE             True      0     True  True  False False
 """
 
-import copy
 import csv
 
 from curiosity_agent_v0_14 import (
-    FRAME, NEUTRAL, HAZARD, ATTRACTOR, END_STATE, KNOWLEDGE,
-    FLAG_THRESHOLD, MASTERY_THRESHOLD, KNOWLEDGE_THRESHOLD,
-    FEATURE_DRIVE_WEIGHT, ATTRACTION_BONUS,
     DevelopmentalAgent as V014Agent,
+    FRAME, NEUTRAL, HAZARD, ATTRACTOR, END_STATE, KNOWLEDGE,
+    PHASE_3_START_FRACTION, FEATURE_DRIVE_WEIGHT,
+    FLAG_THRESHOLD, MASTERY_THRESHOLD, KNOWLEDGE_THRESHOLD,
+)
+
+# ---------------------------------------------------------------------------
+# SCHEMA_FIELDS
+# ---------------------------------------------------------------------------
+
+# Run identification fields
+_ID_FIELDS = ["arch", "hazard_cost", "num_steps", "run_idx", "seed"]
+
+# Cell type fields: six properties × six types
+_CELL_TYPES = ["FRAME", "NEUTRAL", "HAZARD", "ATTRACTOR", "END_STATE", "KNOWLEDGE"]
+_CT_PROPS   = [
+    "passable", "cost_on_entry",
+    "feature_reward_eligible", "attraction_bias_eligible",
+    "gating_eligible", "transformation_eligible",
+]
+_CT_FIELDS = [
+    f"ct_{ct}_{prop}"
+    for ct in _CELL_TYPES
+    for prop in _CT_PROPS
+]
+
+# Action vocabulary fields (4 actions)
+_ACTION_NAMES = ["UP", "DOWN", "LEFT", "RIGHT"]
+_ACTION_PROPS = ["code", "description"]
+_ACTION_FIELDS = [
+    f"action_{act}_{prop}"
+    for act in _ACTION_NAMES
+    for prop in _ACTION_PROPS
+]
+
+# Phase schedule fields (3 phases)
+_PHASE_NAMES = ["PHASE_1", "PHASE_2", "PHASE_3"]
+_PHASE_PROPS = [
+    "code", "description",
+    "novelty_weight", "progress_weight",
+    "preference_weight", "feature_weight",
+]
+_PHASE_FIELDS = [
+    f"phase_{ph}_{prop}"
+    for ph in _PHASE_NAMES
+    for prop in _PHASE_PROPS
+]
+
+# Flag type fields (4 flag types)
+_FLAG_TYPES = ["THREAT", "MASTERY", "KNOWLEDGE_BANKING", "END_STATE"]
+_FLAG_PROPS = [
+    "formation_condition", "formation_threshold",
+    "confirming_operationalisation", "disconfirming_semantics",
+    "applicable_cell_types",
+]
+_FLAG_FIELDS = [
+    f"flag_{ft}_{prop}"
+    for ft in _FLAG_TYPES
+    for prop in _FLAG_PROPS
+]
+
+# Summary fields
+_SUMMARY_FIELDS = ["schema_cell_types_count", "schema_complete"]
+
+SCHEMA_FIELDS = (
+    _ID_FIELDS
+    + _CT_FIELDS
+    + _ACTION_FIELDS
+    + _PHASE_FIELDS
+    + _FLAG_FIELDS
+    + _SUMMARY_FIELDS
 )
 
 
 # ---------------------------------------------------------------------------
-# Schema field names for the output CSV (one row per run).
-# The schema content is largely identical across all runs at matched
-# parameters; the run_id fields allow cross-run verification (Category β)
-# and per-run consistency checks (Category δ3).
+# Schema content (architecture-level constants)
 # ---------------------------------------------------------------------------
 
-SCHEMA_FIELDS = [
-    # Run identification
-    "arch", "hazard_cost", "num_steps", "run_idx", "seed",
+def _build_cell_type_schema():
+    return {
+        "FRAME": {
+            "code": FRAME,
+            "passable": False,
+            "cost_on_entry": None,
+            "feature_reward_eligible": False,
+            "attraction_bias_eligible": False,
+            "gating_eligible": False,
+            "transformation_eligible": False,
+        },
+        "NEUTRAL": {
+            "code": NEUTRAL,
+            "passable": True,
+            "cost_on_entry": 0,
+            "feature_reward_eligible": False,
+            "attraction_bias_eligible": False,
+            "gating_eligible": False,
+            "transformation_eligible": False,
+        },
+        "HAZARD": {
+            "code": HAZARD,
+            "passable": True,
+            "cost_on_entry": ">0",
+            "feature_reward_eligible": False,
+            "attraction_bias_eligible": False,
+            "gating_eligible": True,
+            "transformation_eligible": True,
+        },
+        "ATTRACTOR": {
+            "code": ATTRACTOR,
+            "passable": True,
+            "cost_on_entry": 0,
+            "feature_reward_eligible": True,
+            "attraction_bias_eligible": True,
+            "gating_eligible": False,
+            "transformation_eligible": False,
+        },
+        "END_STATE": {
+            "code": END_STATE,
+            "passable": True,
+            "cost_on_entry": 0,
+            "feature_reward_eligible": True,
+            "attraction_bias_eligible": True,
+            "gating_eligible": True,
+            "transformation_eligible": False,
+        },
+        "KNOWLEDGE": {
+            "code": KNOWLEDGE,
+            "passable": True,
+            "cost_on_entry": 0,
+            "feature_reward_eligible": True,
+            "attraction_bias_eligible": True,
+            "gating_eligible": False,
+            "transformation_eligible": False,
+        },
+    }
 
-    # Cell-type schema: one column per (cell_type, property) pair.
-    # 6 types × 6 properties = 36 columns.
-    "ct_FRAME_passable",
-    "ct_FRAME_cost_on_entry",
-    "ct_FRAME_feature_reward_eligible",
-    "ct_FRAME_attraction_bias_eligible",
-    "ct_FRAME_gating_eligible",
-    "ct_FRAME_transformation_eligible",
 
-    "ct_NEUTRAL_passable",
-    "ct_NEUTRAL_cost_on_entry",
-    "ct_NEUTRAL_feature_reward_eligible",
-    "ct_NEUTRAL_attraction_bias_eligible",
-    "ct_NEUTRAL_gating_eligible",
-    "ct_NEUTRAL_transformation_eligible",
+def _build_action_schema():
+    return {
+        "UP":    {"code": 0, "description": "move up (y-1)"},
+        "DOWN":  {"code": 1, "description": "move down (y+1)"},
+        "LEFT":  {"code": 2, "description": "move left (x-1)"},
+        "RIGHT": {"code": 3, "description": "move right (x+1)"},
+    }
 
-    "ct_HAZARD_passable",
-    "ct_HAZARD_cost_on_entry",
-    "ct_HAZARD_feature_reward_eligible",
-    "ct_HAZARD_attraction_bias_eligible",
-    "ct_HAZARD_gating_eligible",
-    "ct_HAZARD_transformation_eligible",
 
-    "ct_ATTRACTOR_passable",
-    "ct_ATTRACTOR_cost_on_entry",
-    "ct_ATTRACTOR_feature_reward_eligible",
-    "ct_ATTRACTOR_attraction_bias_eligible",
-    "ct_ATTRACTOR_gating_eligible",
-    "ct_ATTRACTOR_transformation_eligible",
+def _build_phase_schema():
+    p3_start = PHASE_3_START_FRACTION
+    return {
+        "PHASE_1": {
+            "code": 1,
+            "description": "Prescribed boustrophedon path exploration",
+            "novelty_weight":    0.0,
+            "progress_weight":   0.0,
+            "preference_weight": 0.0,
+            "feature_weight":    0.0,
+        },
+        "PHASE_2": {
+            "code": 2,
+            "description": "Curiosity-driven exploration",
+            "novelty_weight":    0.3,
+            "progress_weight":   1.2,
+            "preference_weight": 0.0,
+            "feature_weight":    FEATURE_DRIVE_WEIGHT,
+        },
+        "PHASE_3": {
+            "code": 3,
+            "description": f"Preference-driven exploitation (from step {p3_start:.0%})",
+            "novelty_weight":    0.3,
+            "progress_weight":   0.3,
+            "preference_weight": 0.5,
+            "feature_weight":    FEATURE_DRIVE_WEIGHT,
+        },
+    }
 
-    "ct_END_STATE_passable",
-    "ct_END_STATE_cost_on_entry",
-    "ct_END_STATE_feature_reward_eligible",
-    "ct_END_STATE_attraction_bias_eligible",
-    "ct_END_STATE_gating_eligible",
-    "ct_END_STATE_transformation_eligible",
 
-    "ct_KNOWLEDGE_passable",
-    "ct_KNOWLEDGE_cost_on_entry",
-    "ct_KNOWLEDGE_feature_reward_eligible",
-    "ct_KNOWLEDGE_attraction_bias_eligible",
-    "ct_KNOWLEDGE_gating_eligible",
-    "ct_KNOWLEDGE_transformation_eligible",
-
-    # Action schema: 4 actions × 2 offset fields = 8 columns.
-    "act_UP_dx", "act_UP_dy",
-    "act_DOWN_dx", "act_DOWN_dy",
-    "act_LEFT_dx", "act_LEFT_dy",
-    "act_RIGHT_dx", "act_RIGHT_dy",
-
-    # Phase schema: 3 phases × 4 fields = 12 columns.
-    # drive_composition and transition_condition are pipe-delimited strings.
-    "ph_PHASE_1_drive_composition",
-    "ph_PHASE_1_transition_condition",
-    "ph_PHASE_1_phase_number",
-    "ph_PHASE_1_drive_weights",
-
-    "ph_PHASE_2_drive_composition",
-    "ph_PHASE_2_transition_condition",
-    "ph_PHASE_2_phase_number",
-    "ph_PHASE_2_drive_weights",
-
-    "ph_PHASE_3_drive_composition",
-    "ph_PHASE_3_transition_condition",
-    "ph_PHASE_3_phase_number",
-    "ph_PHASE_3_drive_weights",
-
-    # Flag-type schema: 4 types × 5 fields = 20 columns.
-    "ft_THREAT_formation_condition",
-    "ft_THREAT_formation_threshold",
-    "ft_THREAT_confirming_operationalisation",
-    "ft_THREAT_disconfirming_semantics",
-    "ft_THREAT_cell_types_applicable",
-
-    "ft_MASTERY_formation_condition",
-    "ft_MASTERY_formation_threshold",
-    "ft_MASTERY_confirming_operationalisation",
-    "ft_MASTERY_disconfirming_semantics",
-    "ft_MASTERY_cell_types_applicable",
-
-    "ft_KNOWLEDGE_BANKING_formation_condition",
-    "ft_KNOWLEDGE_BANKING_formation_threshold",
-    "ft_KNOWLEDGE_BANKING_confirming_operationalisation",
-    "ft_KNOWLEDGE_BANKING_disconfirming_semantics",
-    "ft_KNOWLEDGE_BANKING_cell_types_applicable",
-
-    "ft_END_STATE_formation_condition",
-    "ft_END_STATE_formation_threshold",
-    "ft_END_STATE_confirming_operationalisation",
-    "ft_END_STATE_disconfirming_semantics",
-    "ft_END_STATE_cell_types_applicable",
-
-    # Schema completeness summary (Category β).
-    "schema_cell_types_count",
-    "schema_actions_count",
-    "schema_phases_count",
-    "schema_flag_types_count",
-    "schema_complete",
-]
+def _build_flag_type_schema():
+    return {
+        "THREAT": {
+            "formation_condition": (
+                f"Three entries to a HAZARD cell (FLAG_THRESHOLD={FLAG_THRESHOLD}) "
+                f"or first-entry signature match"
+            ),
+            "formation_threshold": FLAG_THRESHOLD,
+            "confirming_operationalisation": (
+                "Subsequent entries to the flagged cell without cost reduction"
+            ),
+            "disconfirming_semantics": (
+                "Cell type transitions from HAZARD to KNOWLEDGE "
+                "(v0.14 competency-gated transformation)"
+            ),
+            "applicable_cell_types": "HAZARD",
+        },
+        "MASTERY": {
+            "formation_condition": (
+                f"Three visits to an ATTRACTOR cell "
+                f"(MASTERY_THRESHOLD={MASTERY_THRESHOLD})"
+            ),
+            "formation_threshold": MASTERY_THRESHOLD,
+            "confirming_operationalisation": "Mastery flag set; feature reward depletes",
+            "disconfirming_semantics": "None (mastery flag is permanent)",
+            "applicable_cell_types": "ATTRACTOR",
+        },
+        "KNOWLEDGE_BANKING": {
+            "formation_condition": (
+                f"Three post-transition entries to a KNOWLEDGE cell "
+                f"(KNOWLEDGE_THRESHOLD={KNOWLEDGE_THRESHOLD})"
+            ),
+            "formation_threshold": KNOWLEDGE_THRESHOLD,
+            "confirming_operationalisation": (
+                "Banking step reached; threat flag clears; preference resets"
+            ),
+            "disconfirming_semantics": "None (banking is permanent)",
+            "applicable_cell_types": "KNOWLEDGE",
+        },
+        "END_STATE": {
+            "formation_condition": (
+                "All attractors mastered AND all hazards banked as knowledge "
+                "(v0.14 amended trigger)"
+            ),
+            "formation_threshold": 1,
+            "confirming_operationalisation": "First post-activation entry banks end-state",
+            "disconfirming_semantics": "None (end-state activation is permanent)",
+            "applicable_cell_types": "END_STATE",
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
-# V12Agent: V014Agent subclass with schema.
-# Adds _build_schema() at __init__ time and query_schema() as a read-only
-# interface. No inherited method is overridden.
+# V12Agent
 # ---------------------------------------------------------------------------
 
 class V12Agent(V014Agent):
-    """v0.14 agent with explicit schema (SICC Commitment 1).
+    """v1.2 agent. Extends V014Agent with schema construction.
 
-    The schema is built at construction time from the architecture's
-    own constants and the world's specifications. It does not drive
-    any behavioural pathway; query_schema() is read-only and side-
-    effect-free.
+    Adds query_schema(section) callable. No computational behaviour is
+    modified. The schema is built at construction time from the world's
+    structural properties and the architecture's constants.
     """
 
-    def __init__(self, world, num_steps):
-        super().__init__(world, num_steps)
+    def __init__(self, world, total_steps, num_actions=4):
+        super().__init__(world, total_steps, num_actions=num_actions)
         self._schema = self._build_schema(world)
 
     def _build_schema(self, world):
-        """Construct the four sub-schemas from architectural constants."""
-
-        # ---------------------------------------------------------------
-        # Cell-type schema.
-        # Properties derived from the v0.14 / v0.13 / v0.10 specs:
-        #   passable              — FRAME is the only impassable type.
-        #   cost_on_entry         — HAZARD only (pre-transformation),
-        #                           value is the world's hazard_cost.
-        #   feature_reward_elig.  — ATTRACTOR, END_STATE (pre-banking),
-        #                           KNOWLEDGE (post-transition, pre-banking).
-        #   attraction_bias_elig. — ATTRACTOR, END_STATE (pre-banking).
-        #   gating_eligible       — HAZARD only (hard-gate on flagged cells).
-        #   transformation_elig.  — HAZARD only (v0.14 competency-gated).
-        # ---------------------------------------------------------------
-        hazard_cost = getattr(world, "hazard_cost", None)
-
-        cell_type_schema = {
-            "FRAME": {
-                "code": FRAME,
-                "passable": False,
-                "cost_on_entry": None,
-                "feature_reward_eligible": False,
-                "attraction_bias_eligible": False,
-                "gating_eligible": False,
-                "transformation_eligible": False,
-            },
-            "NEUTRAL": {
-                "code": NEUTRAL,
-                "passable": True,
-                "cost_on_entry": None,
-                "feature_reward_eligible": False,
-                "attraction_bias_eligible": False,
-                "gating_eligible": False,
-                "transformation_eligible": False,
-            },
-            "HAZARD": {
-                "code": HAZARD,
-                "passable": True,
-                "cost_on_entry": hazard_cost,
-                "feature_reward_eligible": False,
-                "attraction_bias_eligible": False,
-                "gating_eligible": True,
-                "transformation_eligible": True,
-            },
-            "ATTRACTOR": {
-                "code": ATTRACTOR,
-                "passable": True,
-                "cost_on_entry": None,
-                "feature_reward_eligible": True,
-                "attraction_bias_eligible": True,
-                "gating_eligible": False,
-                "transformation_eligible": False,
-            },
-            "END_STATE": {
-                "code": END_STATE,
-                "passable": True,
-                "cost_on_entry": None,
-                "feature_reward_eligible": True,
-                "attraction_bias_eligible": True,
-                "gating_eligible": False,
-                "transformation_eligible": False,
-            },
-            "KNOWLEDGE": {
-                "code": KNOWLEDGE,
-                "passable": True,
-                "cost_on_entry": None,
-                "feature_reward_eligible": True,
-                "attraction_bias_eligible": False,
-                "gating_eligible": False,
-                "transformation_eligible": False,
-            },
-        }
-
-        # ---------------------------------------------------------------
-        # Action schema.
-        # Action codes 0–3 as defined in v1.1/v0.14 batch runner world.step:
-        #   0 = UP    (y decreases: dy = -1)
-        #   1 = DOWN  (y increases: dy = +1)
-        #   2 = LEFT  (x decreases: dx = -1)
-        #   3 = RIGHT (x increases: dx = +1)
-        # ---------------------------------------------------------------
-        action_schema = {
-            "UP":    {"code": 0, "dx": 0,  "dy": -1},
-            "DOWN":  {"code": 1, "dx": 0,  "dy": +1},
-            "LEFT":  {"code": 2, "dx": -1, "dy":  0},
-            "RIGHT": {"code": 3, "dx": +1, "dy":  0},
-        }
-
-        # ---------------------------------------------------------------
-        # Phase schema.
-        # Drive compositions and transition conditions from the v0.14
-        # three-phase developmental schedule.
-        # Phase 1: prescribed acquisition — boustrophedon path completion.
-        # Phase 2: drive-based integration — transitions at 60% of run.
-        # Phase 3: preference-weighted autonomy — runs to end.
-        # Drive weights are stored as a dict; None for inactive drives.
-        # ---------------------------------------------------------------
-        phase_schema = {
-            "PHASE_1": {
-                "phase_number": 1,
-                "drive_composition": ["prescribed_path"],
-                "transition_condition": "boustrophedon_path_completion",
-                "drive_weights": {
-                    "prescribed_path": 1.0,
-                    "novelty": None,
-                    "learning_progress": None,
-                    "preference": None,
-                    "feature": None,
-                },
-            },
-            "PHASE_2": {
-                "phase_number": 2,
-                "drive_composition": [
-                    "novelty",
-                    "learning_progress",
-                    "feature",
-                ],
-                "transition_condition": "proportional_run_length_0.6",
-                "drive_weights": {
-                    "prescribed_path": None,
-                    "novelty": 1.0,
-                    "learning_progress": 1.0,
-                    "preference": None,
-                    "feature": FEATURE_DRIVE_WEIGHT,
-                },
-            },
-            "PHASE_3": {
-                "phase_number": 3,
-                "drive_composition": [
-                    "novelty",
-                    "learning_progress",
-                    "preference",
-                    "feature",
-                ],
-                "transition_condition": "run_end",
-                "drive_weights": {
-                    "prescribed_path": None,
-                    "novelty": 1.0,
-                    "learning_progress": 1.0,
-                    "preference": 1.0,
-                    "feature": FEATURE_DRIVE_WEIGHT,
-                },
-            },
-        }
-
-        # ---------------------------------------------------------------
-        # Flag-type schema.
-        # Formation conditions and confirming/disconfirming semantics
-        # from the v1.1 pre-registration §2.2 and §2.3 specifications.
-        # ---------------------------------------------------------------
-        flag_type_schema = {
-            "THREAT": {
-                "formation_condition": (
-                    "hazard_cell_entered FLAG_THRESHOLD times (v0.10 rule) "
-                    "OR first_entry_signature_match on same-category cell "
-                    "(v0.12 rule)"
-                ),
-                "formation_threshold": FLAG_THRESHOLD,
-                "confirming_operationalisation": (
-                    "signature_match_at_adjacent_same_category_cell | "
-                    "forced_entry_to_flagged_cell | "
-                    "phase_boundary_persistence_as_hazard"
-                ),
-                "disconfirming_semantics": (
-                    "v0.14_competency_gated_transformation: cell transitions "
-                    "from HAZARD to KNOWLEDGE; exactly one disconfirming "
-                    "observation recorded per transformation event"
-                ),
-                "cell_types_applicable": ["HAZARD"],
-            },
-            "MASTERY": {
-                "formation_condition": (
-                    f"attractor_cell_entered {MASTERY_THRESHOLD} times "
-                    "(v0.11.2 rule)"
-                ),
-                "formation_threshold": MASTERY_THRESHOLD,
-                "confirming_operationalisation": (
-                    "post_banking_visit_to_mastered_attractor_cell"
-                ),
-                "disconfirming_semantics": (
-                    "none_under_present_architecture: mastery_flags_do_not_"
-                    "retract; slot_exists_for_future_iterations"
-                ),
-                "cell_types_applicable": ["ATTRACTOR"],
-            },
-            "KNOWLEDGE_BANKING": {
-                "formation_condition": (
-                    f"knowledge_cell_entered {KNOWLEDGE_THRESHOLD} times "
-                    "post_v0.14_transformation (v0.14 rule)"
-                ),
-                "formation_threshold": KNOWLEDGE_THRESHOLD,
-                "confirming_operationalisation": (
-                    "post_banking_visit_to_banked_knowledge_cell"
-                ),
-                "disconfirming_semantics": (
-                    "none_under_present_architecture: knowledge_banking_flags"
-                    "_do_not_retract; slot_exists_for_future_iterations"
-                ),
-                "cell_types_applicable": ["KNOWLEDGE"],
-            },
-            "END_STATE": {
-                "formation_condition": (
-                    "all_attractors_mastered_AND_all_hazards_banked_as_"
-                    "knowledge trigger fires (v0.14_amended activation); "
-                    "banking on first_post_activation_entry to end_state_cell"
-                ),
-                "formation_threshold": 1,
-                "confirming_operationalisation": (
-                    "activation: post_activation_steps_where_all_attractors_"
-                    "mastered_AND_all_hazards_banked_as_knowledge_holds | "
-                    "banking: post_banking_visit_to_end_state_cell"
-                ),
-                "disconfirming_semantics": (
-                    "none_under_present_architecture: end_state_flags_do_not_"
-                    "retract; slot_exists_for_future_iterations"
-                ),
-                "cell_types_applicable": ["END_STATE"],
-            },
-        }
-
         return {
-            "cell_types": cell_type_schema,
-            "actions": action_schema,
-            "phases": phase_schema,
-            "flag_types": flag_type_schema,
+            "cell_types":  _build_cell_type_schema(),
+            "actions":     _build_action_schema(),
+            "phases":      _build_phase_schema(),
+            "flag_types":  _build_flag_type_schema(),
         }
 
-    def query_schema(self, domain, key=None):
-        """Return schema content for a named domain.
+    def query_schema(self, section):
+        """Return a schema section dict.
 
-        domain : 'cell_types' | 'actions' | 'phases' | 'flag_types'
-        key    : optional string; if provided, returns only that entry.
-
-        Returns a deep copy so callers cannot mutate the schema.
-        Raises KeyError if the domain or key does not exist.
+        section: one of "cell_types", "actions", "phases", "flag_types"
+        Returns a copy to prevent mutation.
         """
-        if domain not in self._schema:
-            raise KeyError(
-                f"Unknown schema domain {domain!r}. "
-                f"Valid domains: {list(self._schema)}"
-            )
-        sub = self._schema[domain]
-        if key is not None:
-            if key not in sub:
-                raise KeyError(
-                    f"Key {key!r} not found in schema domain {domain!r}. "
-                    f"Available keys: {list(sub)}"
-                )
-            return copy.deepcopy(sub[key])
-        return copy.deepcopy(sub)
+        import copy
+        return copy.deepcopy(self._schema.get(section, {}))
 
 
 # ---------------------------------------------------------------------------
-# V12SchemaObserver: parallel observer that serialises the agent's schema.
+# V12SchemaObserver
 # ---------------------------------------------------------------------------
 
 class V12SchemaObserver:
-    """Parallel observer — writes the agent's schema to schema_v1_2.csv.
+    """v1.2 parallel schema observer.
 
-    Called by the batch runner at on_run_end() once per run. Does not
-    modify the agent or the world. Does not call on_pre_action() or
-    on_post_event(); those hooks are included for interface compatibility
-    with the v1.0 and v1.1 observer pattern but are no-ops here.
+    Constructs the schema at __init__ time and populates self._row at
+    on_run_end. The three hook methods (on_pre_action, on_post_event,
+    on_run_end) follow the parallel-observer pattern.
 
-    The schema content should be identical across all 180 runs at
-    matched parameters (Category δ3). Any deviation from uniformity
-    is logged as a category-δ3 anomaly in the per-run row's
-    schema_complete field.
+    Attributes
+    ----------
+    _row : dict | None
+        Flat dict of schema fields for this run. None until on_run_end.
+    _meta : dict
+        Run identification dict (arch, hazard_cost, num_steps, run_idx, seed).
     """
 
     EXPECTED_CELL_TYPES = {
         "FRAME", "NEUTRAL", "HAZARD", "ATTRACTOR", "END_STATE", "KNOWLEDGE",
     }
-    EXPECTED_ACTIONS = {"UP", "DOWN", "LEFT", "RIGHT"}
-    EXPECTED_PHASES = {"PHASE_1", "PHASE_2", "PHASE_3"}
-    EXPECTED_FLAG_TYPES = {
-        "THREAT", "MASTERY", "KNOWLEDGE_BANKING", "END_STATE",
-    }
+    EXPECTED_ACTIONS    = {"UP", "DOWN", "LEFT", "RIGHT"}
+    EXPECTED_PHASES     = {"PHASE_1", "PHASE_2", "PHASE_3"}
+    EXPECTED_FLAG_TYPES = {"THREAT", "MASTERY", "KNOWLEDGE_BANKING", "END_STATE"}
 
-    def __init__(self, agent, world, run_metadata, cell_type_constants=None):
+    def __init__(self, agent, world, run_metadata):
         self._agent = agent
         self._world = world
-        self._meta = dict(run_metadata)
-        self._row = None
-
-    # ------------------------------------------------------------------
-    # Hook interface (on_pre_action and on_post_event are no-ops here;
-    # the schema does not change during a run).
-    # ------------------------------------------------------------------
+        self._meta  = run_metadata
+        self._row   = None
 
     def on_pre_action(self, step):
         pass
@@ -493,171 +343,100 @@ class V12SchemaObserver:
         pass
 
     def on_run_end(self, step):
-        """Serialise the agent's schema to a flat row dict."""
-        schema = self._agent.query_schema
-        row = {
-            "arch": "v1_2",
-            "hazard_cost": self._meta.get("hazard_cost"),
-            "num_steps": self._meta.get("num_steps"),
-            "run_idx": self._meta.get("run_idx"),
-            "seed": self._meta.get("seed"),
-        }
+        """Build the schema row from the agent's query_schema callable."""
+        if not hasattr(self._agent, 'query_schema') or self._agent.query_schema is None:
+            self._row = None
+            return
 
-        # ----------------------------------------------------------------
-        # Cell-type schema serialisation.
-        # ----------------------------------------------------------------
-        ct_schema = schema("cell_types")
-        for ct_name in [
-            "FRAME", "NEUTRAL", "HAZARD", "ATTRACTOR", "END_STATE", "KNOWLEDGE"
-        ]:
-            entry = ct_schema.get(ct_name, {})
-            prefix = f"ct_{ct_name}_"
-            row[prefix + "passable"] = entry.get("passable")
-            row[prefix + "cost_on_entry"] = entry.get("cost_on_entry")
-            row[prefix + "feature_reward_eligible"] = entry.get(
-                "feature_reward_eligible"
-            )
-            row[prefix + "attraction_bias_eligible"] = entry.get(
-                "attraction_bias_eligible"
-            )
-            row[prefix + "gating_eligible"] = entry.get("gating_eligible")
-            row[prefix + "transformation_eligible"] = entry.get(
-                "transformation_eligible"
-            )
-
-        # ----------------------------------------------------------------
-        # Action schema serialisation.
-        # ----------------------------------------------------------------
+        schema    = self._agent.query_schema
+        ct_schema  = schema("cell_types")
         act_schema = schema("actions")
-        for act_name in ["UP", "DOWN", "LEFT", "RIGHT"]:
-            entry = act_schema.get(act_name, {})
-            prefix = f"act_{act_name}_"
-            row[prefix + "dx"] = entry.get("dx")
-            row[prefix + "dy"] = entry.get("dy")
+        ph_schema  = schema("phases")
+        ft_schema  = schema("flag_types")
 
-        # ----------------------------------------------------------------
-        # Phase schema serialisation.
-        # ----------------------------------------------------------------
-        ph_schema = schema("phases")
-        for ph_name in ["PHASE_1", "PHASE_2", "PHASE_3"]:
-            entry = ph_schema.get(ph_name, {})
-            prefix = f"ph_{ph_name}_"
-            row[prefix + "drive_composition"] = "|".join(
-                entry.get("drive_composition", [])
-            )
-            row[prefix + "transition_condition"] = entry.get(
-                "transition_condition", ""
-            )
-            row[prefix + "phase_number"] = entry.get("phase_number")
-            # Serialise drive_weights dict as "drive:weight|..." string.
-            dw = entry.get("drive_weights", {})
-            row[prefix + "drive_weights"] = "|".join(
-                f"{k}:{v}" for k, v in sorted(dw.items())
-            )
+        row = {}
 
-        # ----------------------------------------------------------------
-        # Flag-type schema serialisation.
-        # ----------------------------------------------------------------
-        ft_schema = schema("flag_types")
-        for ft_name in [
-            "THREAT", "MASTERY", "KNOWLEDGE_BANKING", "END_STATE"
-        ]:
-            entry = ft_schema.get(ft_name, {})
-            prefix = f"ft_{ft_name}_"
-            row[prefix + "formation_condition"] = entry.get(
-                "formation_condition", ""
-            )
-            row[prefix + "formation_threshold"] = entry.get(
-                "formation_threshold"
-            )
-            row[prefix + "confirming_operationalisation"] = entry.get(
-                "confirming_operationalisation", ""
-            )
-            row[prefix + "disconfirming_semantics"] = entry.get(
-                "disconfirming_semantics", ""
-            )
-            row[prefix + "cell_types_applicable"] = "|".join(
-                entry.get("cell_types_applicable", [])
-            )
+        # Run identification
+        for f in _ID_FIELDS:
+            row[f] = self._meta.get(f, "")
 
-        # ----------------------------------------------------------------
-        # Schema completeness summary (Category β).
-        # ----------------------------------------------------------------
+        # Cell types
+        for ct_name in _CELL_TYPES:
+            entry  = ct_schema.get(ct_name, {})
+            prefix = f"ct_{ct_name}_"
+            for prop in _CT_PROPS:
+                row[prefix + prop] = entry.get(prop)
+
+        # Actions
+        for act_name in _ACTION_NAMES:
+            entry  = act_schema.get(act_name, {})
+            prefix = f"action_{act_name}_"
+            for prop in _ACTION_PROPS:
+                row[prefix + prop] = entry.get(prop)
+
+        # Phases
+        for ph_name in _PHASE_NAMES:
+            entry  = ph_schema.get(ph_name, {})
+            prefix = f"phase_{ph_name}_"
+            for prop in _PHASE_PROPS:
+                row[prefix + prop] = entry.get(prop)
+
+        # Flag types
+        for ft_name in _FLAG_TYPES:
+            entry  = ft_schema.get(ft_name, {})
+            prefix = f"flag_{ft_name}_"
+            for prop in _FLAG_PROPS:
+                row[prefix + prop] = entry.get(prop)
+
+        # Summary
         actual_ct = set(ct_schema.keys())
-        actual_act = set(act_schema.keys())
-        actual_ph = set(ph_schema.keys())
-        actual_ft = set(ft_schema.keys())
-
-        row["schema_cell_types_count"] = len(actual_ct)
-        row["schema_actions_count"] = len(actual_act)
-        row["schema_phases_count"] = len(actual_ph)
-        row["schema_flag_types_count"] = len(actual_ft)
-
-        complete = (
-            actual_ct == self.EXPECTED_CELL_TYPES
-            and actual_act == self.EXPECTED_ACTIONS
-            and actual_ph == self.EXPECTED_PHASES
-            and actual_ft == self.EXPECTED_FLAG_TYPES
+        complete  = (
+            actual_ct     == self.EXPECTED_CELL_TYPES
+            and set(act_schema.keys()) == self.EXPECTED_ACTIONS
+            and set(ph_schema.keys())  == self.EXPECTED_PHASES
+            and set(ft_schema.keys())  == self.EXPECTED_FLAG_TYPES
         )
-        row["schema_complete"] = complete
+        row["schema_cell_types_count"] = len(actual_ct)
+        row["schema_complete"]         = complete
+        row["arch"]                    = self._meta.get("arch", "v1_2")
 
         self._row = row
 
-    # ------------------------------------------------------------------
-    # CSV output.
-    # ------------------------------------------------------------------
+    def summary_metrics(self):
+        """Return summary fields for inclusion in run_data CSV."""
+        if self._row is None:
+            return {"schema_complete": False}
+        return {
+            "schema_cell_types_count": self._row.get("schema_cell_types_count"),
+            "schema_complete":         self._row.get("schema_complete"),
+        }
+
+    def get_substrate(self):
+        """Return schema row as flat dict, or None (v1.6 interface)."""
+        if self._row is None:
+            return None
+        return dict(self._row)
 
     def write_schema_csv(self, path, append=False):
-        """Write this run's schema row to path."""
+        """Write schema row to CSV."""
         if self._row is None:
             return
+
+        def _file_has_rows(p):
+            try:
+                with open(p) as f:
+                    lines = [l for l in f if l.strip()]
+                return len(lines) > 1
+            except FileNotFoundError:
+                return False
+
         mode = "a" if append else "w"
         write_header = (not append) or (not _file_has_rows(path))
         with open(path, mode, newline="") as f:
             writer = csv.DictWriter(f, fieldnames=SCHEMA_FIELDS)
             if write_header:
                 writer.writeheader()
-            writer.writerow(
-                {k: self._row.get(k, "") for k in SCHEMA_FIELDS}
-            )
-
-    def summary_metrics(self):
-        """Return per-run schema summary fields for the metrics CSV."""
-        if self._row is None:
-            return {
-                "schema_cell_types_count": 0,
-                "schema_actions_count": 0,
-                "schema_phases_count": 0,
-                "schema_flag_types_count": 0,
-                "schema_complete": False,
-            }
-        return {
-            "schema_cell_types_count": self._row.get(
-                "schema_cell_types_count", 0
-            ),
-            "schema_actions_count": self._row.get("schema_actions_count", 0),
-            "schema_phases_count": self._row.get("schema_phases_count", 0),
-            "schema_flag_types_count": self._row.get(
-                "schema_flag_types_count", 0
-            ),
-            "schema_complete": self._row.get("schema_complete", False),
-        }
+            writer.writerow({k: self._row.get(k, "") for k in SCHEMA_FIELDS})
 
     def reset(self):
         self._row = None
-
-    def record_count(self):
-        return 1 if self._row is not None else 0
-
-
-# ---------------------------------------------------------------------------
-# Helper.
-# ---------------------------------------------------------------------------
-
-def _file_has_rows(path):
-    try:
-        with open(path) as f:
-            lines = [l for l in f if l.strip()]
-        return len(lines) > 1
-    except FileNotFoundError:
-        return False
