@@ -134,8 +134,49 @@ class V110BeliefRevisionObserver:
         pass
 
     def on_post_event(self, step: int) -> None:
-        """Update bias state and track approach movements."""
+        """Detect new HAZARD→KNOWLEDGE transformations; update bias
+        and track approach movements.
+
+        Transformation detection reads world.object_type directly,
+        avoiding the unsafe pe_obs.get_substrate() path. A resolved
+        surprise is: object was in agent.pre_transition_hazard_entries
+        (entered before precondition) AND world.object_type is now
+        KNOWLEDGE (transformation has fired).
+        """
+        self._detect_live_transformations(step)
         self._update_approach_counts(step)
+
+    def _detect_live_transformations(self, step: int) -> None:
+        """Check for HAZARD→KNOWLEDGE transitions this step."""
+        try:
+            from curiosity_agent_v1_7_world import KNOWLEDGE
+        except ImportError:
+            return
+
+        obj_type = getattr(self._world, 'object_type', {})
+        pre_entries = getattr(self._agent, 'pre_transition_hazard_entries', {})
+
+        for oid, count in pre_entries.items():
+            if count == 0:
+                continue
+            if obj_type.get(oid) != KNOWLEDGE:
+                continue
+            # Object transformed AND had pre-transition entries
+            # Check not already processed
+            if oid in self._resolved_seen:
+                continue
+
+            # Find surprise step from PE observer if possible,
+            # otherwise use the first known entry step from agent
+            surp_step = getattr(self._agent,
+                                '_first_pre_transition_step', {}).get(oid)
+            if surp_step is None:
+                # Fall back: use current step as an approximation
+                # (will be corrected by process_pe_substrate at run end)
+                surp_step = step
+
+            self._resolved_seen[oid] = step  # mark as processed
+            self._fire_revision(oid, int(surp_step), int(step), int(step))
 
     def on_run_end(self, total_steps: int) -> None:
         """Finalise bias_active_steps and approach_delta.
@@ -207,21 +248,32 @@ class V110BeliefRevisionObserver:
 
             # Only pre-condition entries that were eventually resolved
             if event.get("precondition_met", True):
-                continue   # Clean entry — not a surprise
-            res_step = event.get("transformed_at_step")
+                continue
+            res_step  = event.get("transformed_at_step")
             if res_step is None:
-                continue   # Pre-condition entry but never resolved
+                continue
 
             oid       = event.get("cell", "")
             surp_step = event.get("step")
             if not oid or surp_step is None:
                 continue
 
-            # Already processed?
-            if self._resolved_seen.get(oid) == res_step:
+            # If already fired by live detection, update the surprise_step
+            # in the existing record to the correct value from PE substrate
+            if oid in self._resolved_seen:
+                for rec in self._records:
+                    if (rec["object_id"] == oid
+                            and rec["surprise_step"] != int(surp_step)):
+                        rec["surprise_step"]    = int(surp_step)
+                        rec["resolution_window"] = int(res_step) - int(surp_step)
+                        rec["precondition_at_revision"] = (
+                            rec["precondition_at_revision"]
+                        )
                 continue
 
-            self._resolved_seen[oid] = res_step
+            # Not yet fired — fire now (unresolved at run end, resolved
+            # surprise that live detection missed)
+            self._resolved_seen[oid] = int(res_step)
             self._fire_revision(oid, int(surp_step), int(res_step),
                                 int(res_step))
 
