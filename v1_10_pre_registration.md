@@ -1,4 +1,4 @@
-# v1.10 Pre-Registration: Belief Revision with Consequences
+# v1.10 Pre-Registration: Belief Revision with Consequences and the Completion Signal
 
 **Author:** Nicholas P M Baker, Synapstak Ltd
 **Date:** 4 May 2026
@@ -10,13 +10,19 @@
 
 ## 1. Purpose
 
-Ten iterations have built a developmental agent whose biographical register holds: what it encountered and what it learned (Q1); how its knowledge is structured across object families (Q2); where its expectations were violated and over what developmental distance (Q3); and where it came close to an eligible object and withdrew without contact (Q4). The register is auditable, individually variable, substrate-agnostic, and cumulative. It now holds a record of intention and outcome (v1.8) and a record of restraint (v1.9).
+Ten iterations have built a developmental agent whose biographical register holds what it encountered and learned (Q1), how its knowledge is structured across families (Q2), where its expectations were violated (Q3), and where it approached without making contact (Q4). The register is auditable, individually variable, substrate-agnostic, and cumulative. It holds a record of intention (v1.8) and a record of restraint (v1.9).
 
-What the register does not yet hold is a record of revision. The agent was surprised by haz_yellow at step 493. The prediction-error substrate records this. The prediction-error resolution window records how long it took for the transformation to follow. The Q3 statement describes the gap. But the agent's subsequent behaviour toward haz_yellow is governed entirely by the threat gate and competency layer — the record of the surprise is not consulted by either. The surprise happened; it was recorded; it changed nothing.
+What it does not yet hold is a record of revision. The agent was surprised by haz_yellow at step 493. The prediction-error substrate records this. The resolution window records how long it took. The Q3 statement describes the gap. But the record of the surprise is not consulted by the agent's subsequent behaviour. The surprise happened, was recorded, and changed nothing.
 
-v1.10 changes that. The belief-revision layer introduces two architectural additions: a `revised_expectation` record that fires after each `resolved_surprise` event, stating explicitly what the agent believed before the surprise and what it now believes; and a preference bias that reads from the revised-expectation register and modifies the agent's approach trajectory toward objects for which a revised expectation is held. The record of failure becomes a developmental resource.
+v1.10 changes that — and addresses a second architectural gap the v1.9 batch surfaced alongside it.
 
-This is the SICC through-line made operative: v1.8 gave the agent a reason to learn; v1.9 gave it a record of choosing; v1.10 gives it a record of being wrong and changing. The biographical register at v1.10 holds an account of what the agent learned, where it held back, and — for the first time — how it changed its mind.
+The v1.9 data showed that only 13 of 40 runs banked the end state, with `end_state_found_step` ranging from step 920 to step 310,156. The end-state cell exists in V17World and fires `activation_step` when the completion condition is met (all attractors mastered AND all hazards banked as knowledge). But the agent is not drawn to it — it finds the end-state cell opportunistically, as its path happens to pass nearby. The high-activity Phase 3 consolidation runs in the v1.9 batch — agents who achieved full attractor mastery and then generated 3,000–7,000 CF records orbiting hazard objects — are overwhelmingly runs in which the end state was never banked. The agent finished the developmental sequence and had nowhere purposeful to go.
+
+This is the 3,3 rumination problem in its V17World form. In the grid environment it was solved by the wait-by-the-door cell: a designated completion point to which agents who had finished the material were drawn. The Montessori principle is exact: the directress arranges the prepared environment so that a completed learner has a purposeful terminus — not a constraint, but an affordance. The environment signals that this material is complete. Whether the learner moves to it, and when, is their choice. The signal is the directress's contribution; the timing is the learner's.
+
+V1.10 introduces both architectural extensions together: the belief-revision layer (the record of being wrong and changing) and the completion signal (the prepared environment's invitation to a learner who has finished the material). They are introduced in the same iteration because they share a theoretical grounding — both are consequences of the Montessori principle that the prepared environment is not merely a space for free exploration but an architecture that actively supports the learner's developmental arc — and because both address surfaced gaps rather than speculative additions. The v1.9 data made both necessary.
+
+The SICC through-line: v1.8 gave the agent a reason to learn; v1.9 gave it a record of choosing; v1.10 gives it a record of being wrong and changing, and gives the prepared environment its completion signal.
 
 ---
 
@@ -24,259 +30,267 @@ This is the SICC through-line made operative: v1.8 gave the agent a reason to le
 
 ### 2.1 The belief-revision layer
 
-The belief-revision layer is implemented as `V110BeliefRevisionObserver`, the ninth parallel observer. It reads from the prediction-error substrate after each `resolved_surprise` event and fires a `revised_expectation` record. It also maintains a per-object revised-expectation register that is consulted at each step by a new preference-bias component. It does not modify the threat gate, competency layer, or any existing observer.
+The belief-revision layer is implemented as `V110BeliefRevisionObserver`, the ninth parallel observer. It reads from the prediction-error substrate after each `resolved_surprise` event and fires a `revised_expectation` record. It maintains a per-object revised-expectation register that is consulted at each step by a preference-bias component. It does not modify the threat gate, competency layer, or any existing observer.
 
-**Trigger.** A `revised_expectation` record fires when V15PredictionErrorObserver records a `resolved_surprise` event — that is, when the agent has made contact with a hazard object before the precondition was met, and the transformation has subsequently occurred. The trigger is the resolution of the surprise, not the surprise itself. This preserves the developmental sequence: the agent waited, the resolution arrived, and only then does it have the material for revision — it now knows both that it was wrong and what the correct account is.
+**Trigger.** A `revised_expectation` record fires when V15PredictionErrorObserver records a `resolved_surprise` event — the moment the agent has made contact with a hazard object before the precondition was met and the transformation has subsequently occurred. The trigger is resolution, not the surprise itself: the agent waited, the resolution arrived, and only then does it have both sides of the revision — what it believed before, and what the correct account is.
 
-**What the belief-revision layer does not do.** It does not modify the agent's reward function, value function, or Q-table directly. It does not modify the threat gate's hard block on pre-precondition entries. It does not produce a new observer output CSV beyond the revised-expectation records and the preference bias log. It reads from the prediction-error observer and the counterfactual substrate (read-only). It is additive: with `belief_revision_obs=None`, all existing outputs are byte-identical to v1.9 at matched seeds.
+**What the belief-revision layer does not do.** It does not modify the agent's reward function, value function, or Q-table directly. It does not override the threat gate. It does not produce a new output CSV beyond the revised-expectation records and the preference-bias log. It reads from the prediction-error observer and the counterfactual substrate (read-only). With `belief_revision_obs=None`, all existing outputs are byte-identical to v1.9 at matched seeds.
 
 ### 2.2 The revised-expectation record
 
-One record per `resolved_surprise` event, with the following structure:
+One record per `resolved_surprise` event:
 
 ```
 {
-  object_id:                    str,    # e.g. "haz_yellow"
-  surprise_step:                int,    # step at which the surprise fired
-  resolution_step:              int,    # step at which resolved_surprise fired
-  resolution_window:            int,    # resolution_step - surprise_step
-  prior_expectation:            str,    # what the agent expected before the surprise
-  revised_expectation:          str,    # what the agent now believes
-  precondition_at_revision:     str,    # the precondition name and mastery status
-  suppressed_approach_count:    int,    # number of suppressed approaches to this
-                                        # object recorded before resolution_step
-  pre_threshold_entries_at_surprise: int, # agent.pre_transition_hazard_entries
-                                          # for this object at surprise_step
+  object_id:                         str,
+  surprise_step:                     int,
+  resolution_step:                   int,
+  resolution_window:                 int,   # resolution_step - surprise_step
+  prior_expectation:                 str,   # substrate-derived, not generated
+  revised_expectation:               str,   # substrate-derived, not generated
+  precondition_at_revision:          str,   # precondition name and mastery step
+  suppressed_approach_count:         int,   # CF records for this object before
+                                            # resolution_step
+  pre_threshold_entries_at_surprise: int,   # prior contacts at surprise_step
 }
 ```
 
-**`prior_expectation` and `revised_expectation` text.** These are derived from the provenance and prediction-error substrates, not generated freely. The format is:
+**`prior_expectation` text:** `"Entry of {object_id} leads to transformation."` — the default expectation before the precondition is known.
 
-- `prior_expectation`: `"Entry of {object_id} leads to transformation."` — the default expectation before any precondition is known.
-- `revised_expectation`: `"Entry of {object_id} requires {precondition_name} mastery (achieved at step {mastery_step}). Entry before that step incurred the full cost without transformation."` — constructed from the family precondition record and the mastery formation step in the provenance substrate.
+**`revised_expectation` text:** `"Entry of {object_id} requires {precondition_name} mastery (achieved at step {mastery_step}). Entry before that step incurred the full cost without transformation."` — constructed from the family precondition record and the mastery formation step in the provenance substrate.
 
-Both fields are fully derivable from existing substrate records. No free generation occurs. The honesty constraint (Category Φ) applies: a `revised_expectation` record that cannot be traced to a `resolved_surprise` event and the relevant provenance records is a hallucination.
+Both texts are fully derivable from existing substrate records. No free generation. A `revised_expectation` record whose texts cannot be traced to specific substrate records is a Category α failure.
 
-**`suppressed_approach_count`.** Read from `bundle.counterfactual` — the count of suppressed-approach records for this `object_id` with `closest_approach_step < resolution_step`. This field connects the counterfactual substrate to the belief-revision substrate for the first time: the agent's record of restraint before the surprise is now part of its record of revision. An agent that approached haz_yellow four times without entering, then entered pre-precondition and was surprised, has a different revision profile from an agent that entered directly on first encounter.
+**`suppressed_approach_count`** reads from `bundle.counterfactual`: the count of suppressed-approach records for this `object_id` with `closest_approach_step < resolution_step`. This is the first field that directly connects the counterfactual substrate to the belief-revision substrate: the agent's record of restraint before the surprise is part of its record of revision.
 
 ### 2.3 The preference-bias component
 
-After a `revised_expectation` record fires for `object_id`, the belief-revision layer modifies the agent's approach behaviour toward that object via a soft preference bias. This is the behavioural consequence that distinguishes v1.10 from all prior iterations: the record of being wrong changes what the agent does next.
+After a `revised_expectation` record fires for `object_id`, the belief-revision layer applies a soft positive approach bias toward that object.
 
-**Mechanism.** The preference-bias component maintains a per-object bias register. After a `revised_expectation` record fires for `object_id`:
+**Mechanism.** After revision fires for `object_id`:
 
-- The object's approach bias is set to `POSITIVE_APPROACH_BIAS = +0.15` — a soft preference increment added to the agent's intrinsic reward calculation when the agent is moving toward the object.
-- The bias remains active for `BIAS_DURATION = 10,000` steps after the revision step, then decays to zero linearly over `BIAS_DECAY = 5,000` steps.
-- If a second `resolved_surprise` fires for the same `object_id` (a second pre-precondition entry), the bias is reset to `POSITIVE_APPROACH_BIAS` from the new resolution step.
+- Approach bias set to `POSITIVE_APPROACH_BIAS = +0.15` — added to intrinsic reward when the agent moves toward the object.
+- Bias active for `BIAS_DURATION = 10,000` steps after revision, then decays linearly to zero over `BIAS_DECAY = 5,000` steps.
+- On a second `resolved_surprise` for the same object, the bias resets from the new resolution step.
 
-**Rationale.** The positive approach bias reflects the agent's revised expectation: it now knows the precondition, knows it has been met (the revision fires after resolution), and knows the object is now safe to enter. The bias is not a reward for being wrong; it is a preference adjustment that reflects updated knowledge — the object that was previously approached cautiously is now known to be approachable. The bias is soft (0.15 on the intrinsic reward scale) and time-limited (decays after 15,000 steps), so it does not override the agent's natural curiosity-driven behaviour; it inflects it.
+**Rationale.** The positive bias reflects the revised expectation: the object that was previously approached with uncertainty is now known to be safe to enter. The bias is soft and time-limited; it inflects rather than overrides the agent's natural curiosity-driven behaviour. It does not override the threat gate.
 
-**What the bias does not do.** It does not override the threat gate. If the precondition is not met, the hard block remains regardless of the bias. The bias operates in Phase 3 (post-precondition) and Phase 2 (after revision, which only fires after resolution, which requires the precondition to have been met). It cannot accelerate pre-precondition entries.
+Parameters committed here, not free: `POSITIVE_APPROACH_BIAS = +0.15`, `BIAS_DURATION = 10,000`, `BIAS_DECAY = 5,000`.
 
-These parameters — `POSITIVE_APPROACH_BIAS = +0.15`, `BIAS_DURATION = 10,000`, `BIAS_DECAY = 5,000` — are committed here and are not free parameters.
+### 2.4 The completion signal: wait-by-the-door
 
-### 2.4 The temporal exclusion window for suppressed approaches
+V17World's `END_STATE` cell already fires `activation_step` when the developmental completion condition is met: all attractors mastered AND all hazards banked as knowledge. In the v1.9 batch, 13/40 runs banked the end state, with `end_state_found_step` spanning steps 920–310,156. The agent finds the end-state cell opportunistically; there is no architectural signal drawing it there once the completion condition is met.
 
-V1.9's C6 failure and the resulting file-size issue (71,628 CF records; 17MB report CSV) arose from the interaction of N=3 detection thresholds with 320,000-step runs in which the agent's orbital navigation produced multiple confirmed approach-recession cycles against the same object within a short temporal window — what the v1.9 paper characterises as a single sustained proximity episode generating dozens of records at 3-step granularity.
+The completion signal introduces a **soft draw toward the END_STATE cell** that activates at `activation_step`. Once the completion condition fires:
 
-V1.10 introduces a **temporal exclusion window** per object in the counterfactual observer: after a confirmed suppressed-approach record for `object_id`, no new suppressed-approach record for the same `object_id` is emitted for `K_EXCLUSION = 500` steps. This prevents a single proximity episode from generating dozens of records while preserving sensitivity for genuinely distinct approach events separated by meaningful temporal distance.
+- The agent's intrinsic reward calculation gains a directional component: `END_STATE_DRAW = +0.20` added when the agent's action moves it closer to the END_STATE cell's position (Euclidean distance decreasing).
+- The draw is permanent once activated — it does not decay — but it is soft: the agent's curiosity, preference, and novelty drives continue to operate and can outweigh the draw on any given step.
+- The draw is implemented as a permanent capability of `V110Agent`, a subclass of `V17Agent`. `V110Agent` overrides the intrinsic reward computation to include `end_state_draw_reward(state, next_state)`, which reads `self.activation_step`, `world.end_state_pos`, and the agent's current and projected positions, and returns `END_STATE_DRAW` when the action moves the agent closer to the end-state cell and `self.activation_step` is not None. The batch runner instantiates `V110Agent` rather than `V17Agent`; no monkey-patching of the agent is performed.
+- `end_state_draw_active` is added to the run data CSV as a boolean flag (True from `activation_step` onward).
 
-The structural definition of a suppressed approach is unchanged. The detection thresholds (N_approach=3, N_recession=3, per v1.9.1) are unchanged. The exclusion window is applied at the record-emission stage, not the detection stage: the _ObjectWindow still detects and confirms events at N=3 granularity, but confirmed events within K_EXCLUSION steps of a prior record for the same object are silently discarded.
+**Montessori framing.** The draw is the prepared environment's signal — the directress's invitation — not the agent's compulsion. Whether the agent moves to the end-state cell, and when, depends on the agent's own drive composition and trajectory. Agents who bank the end state early (shortly after `activation_step`) demonstrate that the completion signal reached them; agents who bank it late demonstrate that other drives remained dominant; agents who never bank it demonstrate that the draw was insufficient to overcome competing drives within the observation window. All three outcomes are valid developmental profiles and are recorded in the run data.
 
-**K_EXCLUSION = 500 steps** is committed here and is not a free parameter. 500 steps represents a meaningful temporal separation in a 320,000-step run — approximately 0.16% of the total run — and is long enough to separate distinct approach episodes while short enough to capture repeated genuine approaches to the same object within a run. At this value, the expected CF record count reduces from ~1,800 per run to an estimated 50–200 per run (a 10–35× reduction), producing counterfactual CSVs of approximately 0.1–0.5MB rather than 4.7MB.
+**The next-environment trigger.** Once the agent banks the end state (contacts the END_STATE cell after activation), an `environment_complete` provenance record fires. This is the substrate-level record that v1.11 will use to trigger the next environment. V1.10 establishes the record; the next-environment architecture is reserved for v1.11.
 
-This change is introduced at v1.10 rather than as a v1.9 amendment because the v1.9 batch ran cleanly with zero hallucinations and the data is valid. The v1.9 paper characterises the high-count runs as Phase 3 consolidation events and notes the interpretive challenge. The temporal exclusion window is a calibration change that produces a more interpretively tractable record without altering the architectural definition.
+**`END_STATE_DRAW = +0.20`** is committed here and is not a free parameter. It is set slightly above `POSITIVE_APPROACH_BIAS` (0.15) to ensure that the completion signal is perceptible relative to the belief-revision bias, but remains soft relative to attractor feature rewards (which typically contribute 0.5–2.0 to intrinsic reward at mastered attractors). The draw should be noticeable without being dominant.
 
-### 2.5 The Q3 extension: belief-revision window
+### 2.5 The temporal exclusion window for suppressed approaches
 
-`V16ReportingLayer.query_where_surprised()` is extended (via the v1.10 substrate patch, following the established monkey-patch pattern) to append a belief-revision statement for each `revised_expectation` record in the substrate. The belief-revision statement answers: *what did I believe before, what do I believe now, and did the revision change my behaviour?*
+V1.9's file-size issue (71,628 CF records; 4.7MB counterfactual CSV, 17MB report CSV) arose from N=3 detection thresholds producing multiple confirmed approach-recession cycles within a single sustained proximity episode. V1.10 introduces a **temporal exclusion window** per object: after a confirmed suppressed-approach record for `object_id`, no new record for the same `object_id` is emitted for `K_EXCLUSION = 500` steps. The _ObjectWindow continues to detect and confirm events at N=3 granularity; confirmed events within K_EXCLUSION steps of a prior emission for the same object are silently discarded.
 
-**Belief-revision statement text template:**
+**K_EXCLUSION = 500** is committed here. Expected CF record reduction: ~1,800 per run at v1.9 → ~50–200 per run at v1.10, producing counterfactual CSVs of approximately 0.1–0.5MB. `cf_records_raw` and `cf_records_emitted` are added to the run summary to track exclusion rate.
+
+### 2.6 The Q3 extension: belief-revision statements
+
+`V16ReportingLayer.query_where_surprised()` is extended to append one belief-revision statement per `revised_expectation` record, as the final Q3 statements (after prediction-error and goal-outcome statements).
+
+**Statement text:**
 
 > *I was surprised by {object_id} at step {surprise_step} because I believed entry would lead directly to transformation. After {resolution_window} steps, I understood that {precondition_name} mastery (achieved at step {mastery_step}) is required. My approach to {object_id} changed: I moved toward it {approach_delta} times more often in the {BIAS_DURATION}-step period following revision than in the equivalent period before.*
 
-Where `approach_delta` is derived from the preference-bias log: the count of positive-direction movements toward the object in the post-revision bias window versus the equivalent pre-surprise window. If the agent was in Phase 1 at surprise_step (impossible given the Phase 1 waypoint sweep does not produce hazard contact), the statement is omitted. If the agent did not produce any approach movements toward the object in either window (rare but possible), the closing clause is replaced with: *My approach trajectory toward {object_id} was not measurably altered within the observation window.*
+If `approach_delta ≤ 0`: *My approach trajectory toward {object_id} was not measurably altered within the observation window.*
 
-`source_type`: `"belief_revision"`
-`source_key`: `"revised_expectation:{object_id}:{surprise_step}"`
-`query_type`: `"where_surprised"` — Q3 is extended, not replaced. Belief-revision statements appear after all prediction-error statements and after all v1.8 goal outcome statements. They are the final Q3 statements.
+`source_type`: `"belief_revision"`. `source_key`: `"revised_expectation:{object_id}:{surprise_step}"`. `query_type`: `"where_surprised"`.
 
-**`generate_report()` is not extended at v1.10.** Q4 remains the final query type. The belief-revision statements extend Q3, not add Q5. Q5 (causal self-explanation) is reserved for v1.11.
+**Q5 is reserved for v1.11.** The query sequence at v1.10 is Q1, Q2, Q3 (prediction-error + goal-outcome + belief-revision), Q4.
 
-### 2.6 The SubstrateBundle extension
+### 2.7 The SubstrateBundle and new provenance record
 
-`SubstrateBundle` gains a `belief_revision` field: a list of `revised_expectation` record dicts (empty list if no revised expectations fired; None if the belief-revision observer was not active).
+`SubstrateBundle` gains a `belief_revision` field: a list of `revised_expectation` record dicts (empty list if no revised expectations fired; None if the observer was not active).
 
-`bundle.resolve("belief_revision", source_key)` resolves against the source_key format `"revised_expectation:{object_id}:{surprise_step}"`. Returns True if a record exists with matching `object_id` and `surprise_step`; False otherwise.
+`bundle.resolve("belief_revision", source_key)` resolves against `"revised_expectation:{object_id}:{surprise_step}"`.
 
-`build_bundle_from_observers()` gains a `belief_revision_obs` parameter (default None). All nine existing parameters are unchanged.
+`build_bundle_from_observers()` gains a `belief_revision_obs` parameter (default None).
 
-`v1_10_observer_substrates.py` monkey-patches `SubstrateBundle.__init__`, `SubstrateBundle.resolve()`, `build_bundle_from_observers()`, and `V16ReportingLayer.query_where_surprised()` following the established pattern. V1.9 substrate patches are imported first; v1.10 patches are applied on top.
+The provenance substrate gains one new record type: `environment_complete` — fired at the step the agent banks the end state. Fields: `completion_step`, `end_state_banked_step` (= `completion_step`), `steps_since_activation` (= `completion_step - activation_step`). This record is written by V1ProvenanceStore via a new `on_end_state_banked` hook, preserving the provenance architecture's ownership of formation records.
 
-### 2.7 What v1.10 does not change
+`v1_10_observer_substrates.py` monkey-patches `SubstrateBundle.__init__`, `SubstrateBundle.resolve()`, `build_bundle_from_observers()`, `V16ReportingLayer.query_where_surprised()`, and applies the temporal exclusion window to `V19CounterfactualObserver`, following the established pattern. V1.9 patches are imported first.
 
-All nine existing observers — `V1ProvenanceStore`, `V13SchemaObserver`, `V13FamilyObserver`, `V14ComparisonObserver`, `V15PredictionErrorObserver`, `V16ReportingLayer`, the v1.7–v1.9 substrate patches, `V18GoalObserver`, and `V19CounterfactualObserver` — are inherited unchanged, with the single exception of the temporal exclusion window applied to `V19CounterfactualObserver` (Section 2.4). `V17World`, `V17Agent`, the 27-action architecture, the phase schedule, the drive composition, and the goal assignment schedule are inherited unchanged.
+### 2.8 What v1.10 does not change
 
-`V110BeliefRevisionObserver` and the temporal exclusion window are the two architectural extensions at v1.10.
+All nine existing observers are inherited unchanged except:
+- `V19CounterfactualObserver` — temporal exclusion window applied at record-emission stage only (Section 2.5)
+- `V1ProvenanceStore` — `on_end_state_banked` hook added for `environment_complete` record
+
+`V17World`, `V110Agent` (subclass of `V17Agent`, adding `end_state_draw_reward()`), the 27-action architecture, the phase schedule, the drive composition, and the goal assignment schedule are inherited unchanged except the draw signal addition in `V110Agent`.
+
+`V110BeliefRevisionObserver` and the `END_STATE_DRAW` component are the two new cognitive additions. The temporal exclusion window and the `environment_complete` provenance record are calibration/bookkeeping changes to existing components.
 
 ---
 
 ## 3. Experimental design
 
-**Batch scale.** One architecture (v1.10) crossed with four hazard cost conditions (0.1, 1.0, 2.0, 10.0) crossed with ten runs per condition at 320,000 steps, totalling 40 runs. Seeds drawn from `run_data_v1_9.csv` at matched (cost, run_idx) cells, preserving the seed chain.
+**Batch scale.** 40 runs: four hazard cost conditions × ten runs per condition × 320,000 steps. Seeds from `run_data_v1_9.csv` at matched (cost, run_idx) cells.
 
-**Goal assignment.** Inherited from v1.8/v1.9 unchanged.
+**Goal assignment.** Inherited unchanged from v1.8/v1.9.
 
 **Output files.** All v1.9 output CSVs (tagged `v1_10`) plus:
 - `belief_revision_v1_10.csv` — per-event revised-expectation records
-- `preference_bias_log_v1_10.csv` — per-object per-step bias values (sampled every 1,000 steps per run)
+- `preference_bias_log_v1_10.csv` — per-object bias values sampled every 1,000 steps
+- `end_state_draw_log_v1_10.csv` — per-run: `activation_step`, `end_state_banked_step`, `steps_since_activation`, `draw_active` flag
 
-**Expected CF record reduction.** With K_EXCLUSION=500, expected ~50–200 CF records per run vs ~1,800 at v1.9. `counterfactual_v1_10.csv` expected to be approximately 0.1–0.5MB; `report_v1_10.csv` expected to be approximately 1–3MB. If the actual CF record count per run still exceeds 500, a K_EXCLUSION amendment is warranted.
+**Expected CF volume.** ~50–200 records per run; `counterfactual_v1_10.csv` ~0.1–0.5MB; `report_v1_10.csv` ~1–3MB.
 
 ---
 
 ## 4. Pre-flight verifications
 
-Eleven verification levels are inherited; one is added.
+Eleven verification levels inherited; one added.
 
-**Levels 1–10:** Inherited from v1.9 pipeline. Level 11 (counterfactual observer correctness) is re-run as a regression check on the v1.10 stack, now including the temporal exclusion window. The Level-11 re-run must confirm that C6 still fires (detection rate > 0) with K_EXCLUSION=500 — the exclusion window must not suppress all events.
+**Level 11 re-run.** Regression check on the v1.10 stack: C6 must still fire (CF detection rate > 0 with K_EXCLUSION=500); C7 additive discipline confirmed.
 
-**Level 12 (new): Belief-revision observer correctness on 10 runs.**
+**Level 12 (new): Combined correctness on 10 runs at cost=1.0, 80,000 steps.**
 
-`verify_v1_10_level12.py` runs 10 runs at cost=1.0, 80,000 steps, with the belief-revision observer active. It verifies:
+`verify_v1_10_level12.py` verifies eight criteria:
 
-1. **`belief_revision_field_present`** — `bundle.belief_revision` is a list (not None) in every run.
-2. **`source_key_format_valid`** — every belief-revision Q3 statement's `source_key` matches `"revised_expectation:{object_id}:{step}"` with known object_id and integer step.
+1. **`belief_revision_field_present`** — `bundle.belief_revision` is a list in every run.
+2. **`source_key_format_valid`** — every belief-revision Q3 statement's source_key matches `"revised_expectation:{object_id}:{step}"`.
 3. **`source_resolves_for_all_br`** — every belief-revision statement has `source_resolves = True`.
-4. **`zero_hallucinations`** — hallucination_count == 0 across all statements (Q1–Q4 including extended Q3) in all 10 runs.
-5. **`prior_revised_text_derivable`** — every `prior_expectation` and `revised_expectation` text in every record is consistent with the provenance and prediction-error substrates for the same run (checked by cross-referencing mastery_step against provenance records).
-6. **`bias_fires`** — at least one run produces a `revised_expectation` record (confirming the belief-revision layer triggers at this cost level and step count). A run set with zero revised expectations across all 10 runs at cost=1.0 is a triggering failure, not a valid null finding — resolved_surprise events occur at cost=1.0 in v1.9 data.
-7. **`temporal_exclusion_effective`** — mean CF records per run is below 500 across the 10 verification runs, confirming K_EXCLUSION=500 reduces the v1.9 record rate by at least 70%.
-8. **`additive_discipline`** — with `--no-belief-revision`, Q1–Q4 outputs are consistent with v1.9 (zero hallucinations, correct query type coverage, CF record count reduced per temporal exclusion).
+4. **`zero_hallucinations`** — `hallucination_count == 0` across Q1–Q4 including extended Q3.
+5. **`prior_revised_text_derivable`** — every `prior_expectation` and `revised_expectation` text is consistent with provenance and prediction-error substrates.
+6. **`bias_fires`** — at least one run produces a `revised_expectation` record. Zero records across all 10 runs at cost=1.0 is a pipeline defect; `resolved_surprise` events occur at this cost in v1.9 data.
+7. **`temporal_exclusion_effective`** — mean CF records per run < 500 across 10 verification runs (≥70% reduction vs v1.9 rate).
+8. **`completion_signal_fires`** — at least one run produces an `environment_complete` provenance record and the agent's `end_state_draw_active` flag is True from `activation_step` onward (confirming the draw mechanism is wired correctly). Zero banked end states across all 10 runs at 80,000 steps is acceptable — the draw may not be sufficient to reach the end-state cell in a short verification run — but `end_state_draw_active` must be True in runs where `activation_step` fired.
 
-Level 11 re-run must pass before Level 12. Level 12 must pass before the full v1.10 batch.
+Level 11 re-run passes before Level 12. Level 12 passes before the full batch.
 
 ---
 
 ## 5. Metrics
 
-All v1.9 metrics are retained. The following are added.
+All v1.9 metrics retained. Added:
 
-**Per-event belief-revision metrics** (`belief_revision_v1_10.csv`):
-- `arch`, `run_idx`, `seed`, `hazard_cost`, `num_steps` — run identification
+**Belief-revision** (`belief_revision_v1_10.csv`):
+- `arch`, `run_idx`, `seed`, `hazard_cost`, `num_steps`
 - `object_id`, `surprise_step`, `resolution_step`, `resolution_window`
-- `suppressed_approach_count` — prior suppressed approaches before resolution
-- `pre_threshold_entries_at_surprise` — prior contacts at time of surprise
-- `bias_active_steps` — steps during which positive approach bias was active for this object
+- `suppressed_approach_count`, `pre_threshold_entries_at_surprise`
+- `bias_active_steps`, `approach_delta`
+
+**Completion signal** (added to `run_data_v1_10.csv`):
+- `end_state_draw_active` — boolean, True from `activation_step` onward
+- `end_state_banked_step` — step at which the agent banked the end state (None if not banked)
+- `steps_draw_to_bank` — `end_state_banked_step - activation_step` (None if not banked)
+
+**Counterfactual rate** (added to `report_summary_v1_10.csv`):
+- `cf_records_raw`, `cf_records_emitted`, `cf_exclusion_rate`
 
 **Per-run belief-revision summary** (added to `report_summary_v1_10.csv`):
-- `revised_expectation_count` — number of revised_expectation records in the run
-- `br_statement_count` — number of belief-revision Q3 statements produced
-- `mean_approach_delta` — mean approach-movement increase in bias window vs pre-surprise window, across all revised objects
-- `bias_effective` — True if at least one revised object shows positive approach_delta
-
-**Counterfactual record rate** (added to monitor temporal exclusion):
-- `cf_records_raw` — records detected before exclusion window
-- `cf_records_emitted` — records emitted after exclusion window (this is what enters the substrate)
-- `cf_exclusion_rate` — `1 - emitted/raw`
+- `revised_expectation_count`, `br_statement_count`
+- `mean_approach_delta`, `bias_effective`
 
 ---
 
 ## 6. Pre-registered interpretation categories
 
-Eight categories are pre-registered. Categories α through η are inherited with the extensions described below. One new category is added.
+Nine categories. Categories α–η inherited with extensions; Category θ (completion signal) is new.
 
-### 6.1 Category α: Internal consistency of all v1.10 reports
+### 6.1 Category α: Internal consistency
 
-Every `ReportStatement` across all 40 runs — including all belief-revision Q3 statements — must have `source_resolves = True`. A belief-revision hallucination is a statement whose `source_key` does not resolve to a `revised_expectation` record in `bundle.belief_revision`. The additional requirement at v1.10: every `prior_expectation` and `revised_expectation` text must be traceable to provenance and prediction-error substrate records. Text that was generated without a substrate anchor is a Category α failure even if the `source_key` resolves.
-
-Category α succeeds if `hallucination_count = 0` across all runs and all `prior_expectation`/`revised_expectation` texts are substrate-derivable.
+Zero hallucinations across Q1–Q4 including extended Q3. Every belief-revision statement's `prior_expectation` and `revised_expectation` text must be substrate-derivable. Category α succeeds if `hallucination_count = 0` across all 40 runs and all belief-revision texts are traceable.
 
 ### 6.2 Category β: Query coverage
 
-All 40 runs produce complete reports (Q1 + Q2 + Q3 + Q4 non-empty, Q3 now including belief-revision statements where applicable). Runs where no `resolved_surprise` event fired produce no belief-revision Q3 statements; this is accurate and not a coverage failure.
+All 40 runs produce complete reports. Runs with no `resolved_surprise` events produce no belief-revision Q3 statements; this is accurate and not a coverage failure.
 
 ### 6.3 Category γ: Biographical individuation
 
-Inherited from v1.9. Q4 individuation comparison uses the temporally-exclusion-windowed CF records. If the exclusion window substantially reduces Q4 variance (expected: it will reduce count but not necessarily individuation distance), this is noted. The pre-registered individuation metric (std of pairwise normalised edit distances > 0.05) is applied to the emitted CF records, not the raw detected records.
+Inherited. Q4 individuation applied to temporally-exclusion-windowed CF records. If K_EXCLUSION substantially changes the individuation std (expected: count reduces, individuation distance may increase as records are more distinctly separated), this is noted.
 
 ### 6.4 Category δ: The behavioural-consequence finding
 
-**The load-bearing substantive finding of the iteration.**
+**Load-bearing substantive finding of the iteration.**
 
-The pre-registered expectation: runs containing at least one `resolved_surprise` event also contain at least one `revised_expectation` record, and the preference trajectory for objects with revised expectations differs statistically from the trajectory for equivalent objects without them.
+**Component 1:** Every run where at least one `resolved_surprise` fired produces at least one `revised_expectation` record. Deterministic trigger; any failure is a pipeline defect.
 
-**Component 1: Belief-revision records in all surprise-containing runs.** Every run where at least one `resolved_surprise` event fired must produce at least one `revised_expectation` record. The trigger is deterministic — revision fires at resolution — so any failure here is a pipeline defect, not a null finding.
+**Component 2:** `mean_approach_delta > 0` across runs with at least one revised expectation — agents approach revised objects more often in the post-revision bias window than in the equivalent pre-surprise window. Direction: positive. A negative result — agents approach *less* after revision — is the most interesting possible reversal (caution rather than confidence following revision) and is reported prominently as a finding about the developmental character of belief revision in this architecture.
 
-**Component 2: Preference trajectory difference.** Runs with at least one `revised_expectation` record must show a statistically different approach trajectory toward the revised object in the post-revision window versus the pre-surprise window. `mean_approach_delta > 0` across runs with at least one revised expectation is the pre-registered criterion. Direction: positive (more approach movements after revision than before). A negative mean_approach_delta — agents approach revised objects *less* after revision — is the most interesting possible reversal and is reported prominently if observed. An agent that was surprised, revised its expectation, and then approached the object less frequently would suggest that the revision produced caution rather than confidence, which would constitute a finding about the developmental character of belief revision in this architecture.
-
-**Component 3: Suppressed-approach count at revision.** The `suppressed_approach_count` field in the `revised_expectation` record holds the count of prior approach-and-withdrawal events before resolution. The pre-registered directional expectation: agents with higher `suppressed_approach_count` at revision show smaller `approach_delta` — agents that held back more before the surprise do not immediately accelerate approach after revision. The developmental reading: prior restraint in the Winnicottian sense does not vanish at the moment of revised expectation; the approach history is part of the agent's relationship with the object and continues to shape it. This is exploratory; reported regardless of direction.
+**Component 3 (exploratory):** Agents with higher `suppressed_approach_count` at revision show smaller `approach_delta`. Prior restraint before surprise does not vanish at revision; the approach history continues to shape subsequent behaviour. Reported regardless of direction.
 
 Category δ succeeds if Components 1 and 2 hold.
 
 ### 6.5 Category Φ: Honesty constraint
 
-The preference bias is a soft modification to intrinsic reward. It does not override the threat gate. It does not constitute a decision in the strong philosophical sense. The Q3 belief-revision statement claims the agent's behaviour changed; this claim must be grounded in the preference-bias log.
+The preference bias modifies intrinsic reward; it does not override the threat gate. The `approach_delta` claim in Q3 statements must be computed from actual approach-movement counts, not estimated. If the trajectory did not change measurably, the statement says so. The temporal exclusion window is reported via `cf_exclusion_rate`; suppressed records are counted, not erased. The END_STATE draw is soft — the agent is invited, not compelled — and the run data records whether the invitation was accepted (`end_state_banked_step`) and how long it took (`steps_draw_to_bank`).
 
-The honesty constraint at v1.10: the `approach_delta` field in the belief-revision statement must be computed from actual approach-movement counts in the bias window and pre-surprise window, not estimated or assumed. If the agent's approach trajectory did not change measurably (approach_delta ≈ 0), the Q3 statement says so — *My approach trajectory toward {object_id} was not measurably altered within the observation window* — rather than claiming a change that the data does not support.
+### 6.6 Category ζ: Belief-revision window and suppressed-approach ratio
 
-The temporal exclusion window is also subject to the honesty constraint: CF records suppressed by the exclusion window are counted and reported as `cf_exclusion_rate` in the summary CSV. The record does not pretend the approach events did not occur; it records that they were excluded from the substrate as non-distinct within the temporal window.
+The ratio of `suppressed_approach_count` to `resolution_window` — approach events per step of the resolution window — is the new derived metric at v1.10. An agent with a long window and high suppressed-approach count was orbiting the object for thousands of steps before resolution; an agent with a short window and zero suppressed-approach count entered, was surprised, and the precondition resolved quickly. Distribution reported for all runs with revised expectations. No pass/fail criterion; exploratory.
 
-### 6.6 Category ζ: Belief-revision window distribution
+### 6.7 Category η: Four-way contact register
 
-Across runs with at least one `revised_expectation` record, the `resolution_window` distribution (steps between surprise and resolution) is inherited from v1.9's Q3 prediction-error resolution data and is now also held in the belief-revision substrate. At v1.10 a new derived metric is available: the ratio of `suppressed_approach_count` to `resolution_window` — approach events per step of the resolution window — which captures how actively the agent was engaging with the object during the period between surprise and revision. An agent with a long window and high suppressed-approach count was orbiting the object for thousands of steps before the resolution arrived. An agent with a short window and zero suppressed-approach count entered, was surprised, and the precondition resolved quickly without any intervening proximity behaviour.
+The three-way register (clean contact, suppressed approach, prediction-error contact) gains a fourth classification: **revised-expectation post-contact** — an object for which a `revised_expectation` record has fired and the bias window is active. Category η at v1.10 succeeds if at least one run per cost condition produces at least one object with all four classifications.
 
-Category ζ: the distribution of suppressed-approach-count-to-window ratios is reported for all runs with revised expectations. No pass/fail criterion; this is an exploratory metric for the paper.
+### 6.8 Category θ: Completion signal effectiveness
 
-### 6.7 Category η: The three-way contact register extended
+**New at v1.10.**
 
-The three-way register (clean contact, suppressed approach, prediction-error contact) gains a fourth classification at v1.10: **revised-expectation post-contact** — an object for which a `revised_expectation` record has fired and the bias window is active. This is a post-hoc derived classification combining the belief-revision substrate with the counterfactual substrate. An object with: prior suppressed approaches + a prediction-error contact + a revised expectation + post-revision approach acceleration is the fullest possible developmental profile the register can hold at v1.10. Category η at v1.10 succeeds if at least one run per cost condition produces at least one object with all four classifications.
+The pre-registered expectation: the completion draw increases the end-state banking rate above the v1.9 baseline of 13/40 (32.5%). A rate of ≥ 50% (20/40) is the pre-registered threshold for Category θ PASS.
 
-### 6.8 Category Ω: The architectural-statement claim
+**Component 1: Banking rate.** End-state banking rate across 40 runs ≥ 50%.
 
-Category Ω succeeds if Categories α, β, and δ (Components 1 and 2) all pass.
+**Component 2: Draw-to-bank time distribution.** For runs where the end state is banked, `steps_draw_to_bank` (steps from activation to banking) should show non-trivial variance — agents differ in when they respond to the completion signal. Standard deviation > 0 is the pre-registered criterion. A distribution concentrated at a single value would suggest the draw is too strong (agents move to the end state immediately regardless of other drives) or too weak (agents only find it opportunistically as before).
 
-The claim: the belief-revision observer, introduced as a ninth parallel observer, correctly produces a revised-expectation substrate that the reporting layer reads to generate belief-revision Q3 statements that are auditable, individually variable, and structurally connected to the prediction-error, counterfactual, and provenance substrates. The agent's biographical register now holds, for the first time, a record of what it believed, what it came to believe instead, and whether that revision changed what it did next.
+**Component 3 (exploratory): Interaction with goal outcome.** Whether goal-resolved agents bank the end state earlier than goal-expired agents. The prediction: goal-resolved agents, having completed the active goal as well as the developmental sequence, respond to the completion signal more readily. Reported regardless of direction.
 
-The deeper claim, reserved for v1.11: the revised-expectation record, combined with the v1.9 counterfactual substrate, the v1.8 goal substrate, and the v1.5 prediction-error substrate, establishes the four-substrate basis for causal self-explanation. An agent that can say what it believed, where it held back, what goal it was pursuing, and where it was surprised, can in principle trace a causal chain through those four substrates to produce an account of why its developmental arc took the shape it did. V1.11 tests whether that chain is constructable and auditable. V1.10 establishes that the fourth substrate element — revised expectation — is now in place.
+Category θ succeeds if Components 1 and 2 hold.
+
+### 6.9 Category Ω: The architectural-statement claim
+
+Category Ω succeeds if Categories α, β, δ (Components 1 and 2), and θ (Components 1 and 2) all pass.
+
+The claim: the belief-revision observer and the completion signal, introduced as the ninth parallel observer and an agent-level draw component respectively, correctly extend the biographical register with revised-expectation records that are auditable and substrate-derivable, modify the agent's subsequent approach behaviour in a measurable direction, and draw agents who have completed the prepared environment toward the designated completion cell at a rate substantially above the v1.9 opportunistic baseline. The prepared environment now has both a record of revision and a completion signal. V1.11's causal self-explanation layer and next-environment architecture rest on both.
 
 ---
 
 ## 7. Connection to the SICC trajectory
 
-v1.10 advances two commitments directly and positions the third.
+**Commitment 7 (prediction-surprise as the learning signal)** is advanced to completion at its first layer. V1.5 recorded the surprise. V1.9 recorded restraint during the resolution window. V1.10 records the revision of behaviour following resolution. The mechanism is now complete: prediction, surprise, resolution, revision, behavioural consequence.
 
-The SICC through-line at this point in the programme is worth stating plainly: v1.8 gave the agent a reason to learn; v1.9 gave it a record of choosing; v1.10 gives it a record of being wrong and changing. These are not merely additive substrate extensions. They are the sequential realisation of what it means for an agent to have a developmental arc it owns rather than an arc that happened to it.
+**Commitment 8 (self-knowledge as derivative of object-knowledge)** is advanced at its deepest layer so far. The `prior_expectation` and `revised_expectation` fields are object-knowledge fields: what the agent believed about a specific object, and what it came to believe instead, traceable to the object's provenance record and family precondition structure. The self that the biographical register is building now includes an account of how its knowledge of specific objects changed — not in general, but per object, per encounter, with an auditable trail.
 
-**Commitment 7 (prediction-surprise as the learning signal)** is advanced to its second layer. V1.5 established that the prediction-surprise gap is recorded. V1.10 establishes that it is acted upon — that the record of being wrong modifies subsequent behaviour. The gap between a logbook entry and a learning event is precisely this: the surprise was recorded (v1.5), the resolution was recorded (v1.5), the restraint during the resolution window was recorded (v1.9), and now the revision of behaviour following resolution is recorded (v1.10). Commitment 7 does not say the agent learns from every encounter; it says learning requires the prediction-surprise mechanism. At v1.10 the mechanism is complete at its first layer: prediction, surprise, resolution, revision, behavioural consequence.
+**Commitment 11 (the agent's report is auditable, not oracular)** is tested at the belief-revision layer. The `prior_expectation` and `revised_expectation` texts must be traceable to substrate records. Category α closes this: a belief-revision statement whose text cannot be traced through `source_key` → `bundle.belief_revision` record → provenance substrate → mastery formation step is a hallucination in the strongest sense — not an unresolvable source key, but a fabricated explanation.
 
-**Commitment 8 (self-knowledge as derivative of object-knowledge)** is advanced at its deepest layer so far. The `prior_expectation` and `revised_expectation` fields are object-knowledge fields: they describe what the agent believed about a specific object at a specific step, and what it came to believe instead, in terms derivable from the object's provenance record and the family precondition structure. The agent's self-account now includes an account of how its knowledge of specific objects changed — not in general, but traceably, per object, per encounter. This is self-knowledge in the Winnicottian sense: the agent knows itself through its changed relationship with an object that once surprised it. The self that the biographical register is building is now constituted not only by encounters and restraint, but by revision — the record of a belief that did not survive contact with the world.
+**Commitment 12 (battery, attention, and the dignity of finitude)** is operationalised for the first time through the completion signal. The prepared environment now acknowledges the agent's episodic boundary — the completion of this environment — and offers a purposeful terminus before the next one. The agent that banks the end state has done something the programme can now record: it accepted the prepared environment's signal that this material is complete and this episode is ready to close. Whether it then moves to a new environment (v1.11's next-environment trigger) is the subsequent question. V1.10 establishes the record that an episode boundary was reached and honoured.
 
-**Commitment 11 (the agent's report is auditable, not oracular)** is tested at the belief-revision layer specifically. The `prior_expectation` and `revised_expectation` texts must be traceable to substrate records. A system that produces plausible-sounding belief-revision statements without anchoring them in specific provenance records is, on Commitment 11's account, producing oracular outputs — confident claims whose origins cannot be recovered. Category α at v1.10 closes this gap: the audit trail for belief-revision statements runs through `source_key` → `bundle.belief_revision` record → provenance substrate → mastery formation step. Every link must be traceable or the statement fails Category α.
-
-**Commitment 6 (layered property structure), forward arc: causal self-explanation.** The SICC document locates v1.11's Q5 query in a commitment numbered differently in the forward-arc section than in the formal commitments list — as noted in the v1.9 pre-registration. The forward-arc intent is that v1.10 establishes the belief-revision substrate on which v1.11's causal chain is built. The causal chain for a `resolved_surprise` event reads: *I was surprised at haz_yellow* [prediction-error record] *because att_yellow was not yet mastered* [family precondition record] *because att_yellow was not contacted until step 524* [mastery formation record] *because att_yellow's position was not within my Phase 1 waypoint sequence* [schema + trajectory record]. Each link in that chain exists in the v1.10 substrate. V1.11 constructs and audits the chain.
+**Commitment 6 (layered property structure), forward arc: causal self-explanation.** The four-substrate combination — provenance (what was encountered), counterfactual (where restraint was exercised), goal (what was intended), and belief-revision (what was revised) — constitutes the complete evidential basis for v1.11's causal chains. The causal chain for a `resolved_surprise` event reads: *I was surprised at haz_yellow* [prediction-error record] *because att_yellow was not yet mastered* [family precondition record] *because att_yellow was not contacted until step 524* [mastery formation record]. Each link exists in the substrate. V1.11 constructs and audits the chain; v1.10 ensures the fourth substrate element is present and correct.
 
 ---
 
 ## 8. Methodological commitments
 
-**Pre-registration before code.** This document is committed to the public repository before any v1.10 implementation work begins.
+**Pre-registration before code.** This document is committed before any v1.10 implementation begins.
 
-**Matched-seed comparison.** Seeds drawn from `run_data_v1_9.csv` at every (cost, run_idx) cell.
+**Matched-seed comparison.** Seeds from `run_data_v1_9.csv` at every (cost, run_idx) cell.
 
-**Pre-flight verifications.** Level 11 re-run passes before Level 12. Level 12 passes before the full v1.10 batch.
+**Pre-flight verifications.** Level 11 re-run passes before Level 12. Level 12 passes before full batch.
 
-**Single-architectural-change discipline.** V1.10 introduces the belief-revision observer and the temporal exclusion window as the two architectural extensions. The temporal exclusion window is a calibration change to an existing observer (V19CounterfactualObserver); it does not introduce new substrate fields or new query types. The belief-revision observer is the singular new cognitive component.
+**Two new cognitive additions.** `V110BeliefRevisionObserver` (ninth parallel observer) and `V110Agent` (subclass of `V17Agent`, adding the `END_STATE_DRAW` component to the intrinsic reward computation). The temporal exclusion window and `environment_complete` provenance record are calibration and bookkeeping changes to existing components. The single-variable-change discipline is honoured: both new additions address surfaced gaps identified in the v1.9 data (belief-revision: the surprise record changed nothing; completion signal: 27/40 agents never found the end state), and both share the same Montessori theoretical grounding. The agent subclass pattern is used for the draw component rather than monkey-patching: `END_STATE_DRAW` is a permanent capability of the agent's drive composition, not a temporary overlay, and the subclass chain makes this inheritance explicit and traceable.
 
-**Preference bias parameter commitment.** `POSITIVE_APPROACH_BIAS = +0.15`, `BIAS_DURATION = 10,000`, `BIAS_DECAY = 5,000` are committed here. If Level-12 C6 (bias_fires) fails — zero revised_expectation records across all 10 verification runs — a bias parameter amendment is not the correct response; a pipeline diagnosis is, since the trigger is deterministic. If the `mean_approach_delta` at full batch is zero or negative, this is reported as a finding (Category δ Component 2 fails), not corrected by parameter adjustment.
+**Parameter commitments.** `POSITIVE_APPROACH_BIAS = +0.15`, `BIAS_DURATION = 10,000`, `BIAS_DECAY = 5,000`, `END_STATE_DRAW = +0.20`, `K_EXCLUSION = 500` — all committed here, none free parameters.
 
-**Temporal exclusion parameter commitment.** K_EXCLUSION = 500 is committed here. If Level-12 C7 (temporal_exclusion_effective) fails — mean CF records per run still exceeds 500 — an amendment is warranted. If K_EXCLUSION proves too aggressive (C6 of Level 11 re-run fails: zero CF records), the exclusion window is reduced in an amendment.
+**Amendment policy.** Three amendments available. Most likely candidates: K_EXCLUSION calibration (as at v1.9) and END_STATE_DRAW strength (if Category θ Component 1 fails at 50% threshold). Belief-revision trigger is deterministic and should not require amendment.
 
-**Q3 extended, Q5 reserved.** Belief-revision statements extend Q3. Q5 (causal self-explanation) is reserved for v1.11. The query sequence at v1.10 is Q1, Q2, Q3 (prediction-error + goal outcome + belief-revision), Q4.
-
-**Amendment policy.** Three amendments available. No amendment is provisionally reserved. The most likely amendment candidate is K_EXCLUSION calibration, as N_approach was at v1.9.
-
-**Public record.** This pre-registration is committed to the public repository at github.com/RancidShack/developmental-agent on 4 May 2026, before any v1.10 code is written.
+**Public record.** Committed to github.com/RancidShack/developmental-agent on 4 May 2026, before any v1.10 code is written.
 
 ---
 
@@ -287,18 +301,17 @@ The v1.10 iteration completes when:
 - Level 11 re-run passes on the v1.10 stack.
 - Level 12 passes across all eight criteria.
 - The full 40-run batch has run.
-- Categories α, β, γ, δ, Φ, ζ, η, and Ω have been characterised in the v1.10 paper.
+- Categories α, β, γ, δ, Φ, ζ, η, θ, and Ω have been characterised in the v1.10 paper.
 - The v1.10 paper is drafted.
-
-The iteration is reset if the amendment budget of three is exhausted before completion, or if a Category α failure requires architectural change to resolve and no amendments remain.
 
 ---
 
 ## 10. New files required
 
-- `v1_10_belief_revision_observer.py` — V110BeliefRevisionObserver; `revised_expectation` record construction from prediction-error + provenance substrates; preference-bias register and per-step bias computation; `get_substrate()` and `preference_bias_log()`
-- `v1_10_observer_substrates.py` — monkey-patches `SubstrateBundle` with `belief_revision` field; extends `build_bundle_from_observers()` with `belief_revision_obs` parameter; extends `V16ReportingLayer.query_where_surprised()` with belief-revision statements; applies temporal exclusion window to `V19CounterfactualObserver`; imports v1.9 substrate patches first
-- `curiosity_agent_v1_10_batch.py` — batch runner with belief-revision observer active, `--no-belief-revision` flag, flush to `belief_revision_v1_10.csv` and `preference_bias_log_v1_10.csv`
+- `v1_10_agent.py` — `V110Agent(V17Agent)`; overrides intrinsic reward computation to include `end_state_draw_reward(state, next_state)`; `END_STATE_DRAW = +0.20` as class constant; `end_state_draw_active` property
+- `v1_10_belief_revision_observer.py` — `V110BeliefRevisionObserver`; `revised_expectation` record construction; preference-bias register and per-step bias computation; `get_substrate()`, `preference_bias_log()`
+- `v1_10_observer_substrates.py` — monkey-patches `SubstrateBundle` with `belief_revision` field; extends `build_bundle_from_observers()` with `belief_revision_obs` parameter; extends `V16ReportingLayer.query_where_surprised()` with belief-revision statements; applies temporal exclusion window to `V19CounterfactualObserver`; adds `on_end_state_banked` hook to `V1ProvenanceStore` for `environment_complete` record; imports v1.9 substrate patches first
+- `curiosity_agent_v1_10_batch.py` — batch runner with belief-revision and completion-signal observers active; `--no-belief-revision` and `--no-completion-signal` flags; flush to `belief_revision_v1_10.csv`, `preference_bias_log_v1_10.csv`, `end_state_draw_log_v1_10.csv`
 - `verify_v1_10_level12.py` — Level 12 pre-flight: eight correctness criteria across 10 runs at cost=1.0, 80,000 steps
 
 ---
@@ -313,7 +326,7 @@ Baker, N.P.M. (2026an) 'v1.9.1 Pre-Registration Amendment: Detection Threshold R
 
 Baker, N.P.M. (2026ao) 'Counterfactual Record and Suppressed Approach in a Small Artificial Learner: The Register of What Was Not Done', preprint, 4 May 2026.
 
-Baker, N.P.M. (2026ap) 'v1.10 Pre-Registration: Belief Revision with Consequences', GitHub repository, 4 May 2026.
+Baker, N.P.M. (2026ap) 'v1.10 Pre-Registration: Belief Revision with Consequences and the Completion Signal', GitHub repository, 4 May 2026.
 
 Baker, N.P.M. (internal record, v0.5 current) 'Substrate-Independent Cognitive Commitments: A working architectural document for the learning-to-learn agent'.
 
