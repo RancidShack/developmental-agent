@@ -108,7 +108,13 @@ class V110Agent(V17Agent):
             return 0.0
 
         # Read positions safely
-        es_pos = getattr(self.world, 'end_state_cell', None)
+        # end_state_cell is a string object ID in V17World;
+        # the position is in world.object_positions
+        es_id  = getattr(self.world, 'end_state_cell', None)
+        if es_id is None:
+            return 0.0
+        obj_positions = getattr(self.world, 'object_positions', {})
+        es_pos = obj_positions.get(es_id)
         if es_pos is None:
             return 0.0
 

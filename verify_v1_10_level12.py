@@ -232,6 +232,14 @@ def _run_one(run_idx, seed, num_steps,
         counterfactual_obs=cf_obs,
         belief_revision_obs=br_obs,
     )
+
+    # Process PE substrate now that bundle is assembled
+    if br_obs is not None:
+        pe_records = getattr(bundle, "prediction_error", None) or []
+        br_obs.process_pe_substrate(pe_records)
+        # Re-build bundle so belief_revision field reflects the records
+        bundle.belief_revision = br_obs.get_substrate()
+
     layer      = V16ReportingLayer(bundle)
     statements = layer.generate_report()
 

@@ -122,6 +122,9 @@ class V110BeliefRevisionObserver:
         # {object_id: {'pre': count, 'post': count}}
         self._approach_counts: Dict[str, Dict[str, int]] = {}
 
+        # Flag: PE substrate has been processed
+        self._pe_processed: bool = False
+
     # ------------------------------------------------------------------
     # Hook methods
     # ------------------------------------------------------------------
@@ -131,13 +134,15 @@ class V110BeliefRevisionObserver:
         pass
 
     def on_post_event(self, step: int) -> None:
-        """Check for new resolved_surprise events; update bias state;
-        track approach movements."""
-        self._check_new_resolutions(step)
+        """Update bias state and track approach movements."""
         self._update_approach_counts(step)
 
     def on_run_end(self, total_steps: int) -> None:
-        """Finalise bias_active_steps and approach_delta for all records."""
+        """Finalise bias_active_steps and approach_delta.
+
+        PE substrate processing happens in process_pe_substrate(),
+        called from the batch runner after build_bundle_from_observers().
+        """
         for rec in self._records:
             oid    = rec["object_id"]
             bw     = self._bias.get(oid)
@@ -154,6 +159,71 @@ class V110BeliefRevisionObserver:
             pre    = counts.get("pre", 0)
             post   = counts.get("post", 0)
             rec["approach_delta"] = post - pre
+
+    # ------------------------------------------------------------------
+    # PE substrate processing (called by batch runner after bundle built)
+    # ------------------------------------------------------------------
+
+    def process_pe_substrate(self, pe_records: list) -> None:
+        """Process PE substrate records to fire revised_expectation.
+
+        Called from the batch runner after build_bundle_from_observers()
+        has assembled the bundle, where bundle.prediction_error holds
+        the fully-populated list of encounter records.
+
+        PE observer on_run_end errors with mixed str/tuple cell types
+        when called directly; reading from the assembled bundle avoids
+        this. The bundle's prediction_error list is populated by the
+        v1.6 substrate bundle machinery, not by pe_obs.get_substrate().
+
+        A resolved encounter is one where the transformation fired after
+        a pre-condition entry. The reporting layer identifies these from
+        the statement text; here we check for the presence of
+        resolution_step (non-None) and entry before precondition met.
+        Field names tried in order to handle PE observer version
+        differences.
+        """
+        if self._pe_processed:
+            return
+        self._pe_processed = True
+
+        if not pe_records:
+            return
+
+        # PE substrate record fields (confirmed from diagnostic):
+        #   cell              — object ID (e.g. "haz_yellow")
+        #   step              — the encounter step (surprise step)
+        #   transformed_at_step — step transformation fired (None if not)
+        #   resolution_window — steps between entry and transformation
+        #                        (0 for clean entries, >0 for resolved surprises)
+        #   precondition_met  — False for pre-transition entries
+        #   encounter_type    — "clean_first_entry" etc.
+        # A resolved surprise: precondition_met=False AND
+        #   transformed_at_step is not None (transformation eventually fired)
+
+        for event in pe_records:
+            if not isinstance(event, dict):
+                continue
+
+            # Only pre-condition entries that were eventually resolved
+            if event.get("precondition_met", True):
+                continue   # Clean entry — not a surprise
+            res_step = event.get("transformed_at_step")
+            if res_step is None:
+                continue   # Pre-condition entry but never resolved
+
+            oid       = event.get("cell", "")
+            surp_step = event.get("step")
+            if not oid or surp_step is None:
+                continue
+
+            # Already processed?
+            if self._resolved_seen.get(oid) == res_step:
+                continue
+
+            self._resolved_seen[oid] = res_step
+            self._fire_revision(oid, int(surp_step), int(res_step),
+                                int(res_step))
 
     # ------------------------------------------------------------------
     # Preference bias interface (called by batch runner)
@@ -207,37 +277,8 @@ class V110BeliefRevisionObserver:
         return rows
 
     # ------------------------------------------------------------------
-    # Internal: resolve detection
+    # Internal: resolve detection (legacy — not called, kept for ref)
     # ------------------------------------------------------------------
-
-    def _check_new_resolutions(self, step: int) -> None:
-        """Scan prediction-error substrate for new resolved_surprise
-        events not yet processed."""
-        try:
-            pe_sub = self._pe_obs.get_substrate()
-        except Exception:
-            return
-
-        # pe_sub is a list of prediction-error event dicts.
-        # We look for records with event_type == "resolved_surprise"
-        # that have a resolution_step <= step and haven't been seen.
-        for event in pe_sub:
-            if event.get("event_type") != "resolved_surprise":
-                continue
-            oid      = event.get("object_id", "")
-            res_step = event.get("resolution_step")
-            surp_step = event.get("surprise_step")
-            if res_step is None or surp_step is None:
-                continue
-            if res_step > step:
-                continue
-            # Already processed?
-            if self._resolved_seen.get(oid) == res_step:
-                continue
-
-            # New resolution — fire revised_expectation record
-            self._resolved_seen[oid] = res_step
-            self._fire_revision(oid, surp_step, res_step, step)
 
     def _fire_revision(self, oid: str, surprise_step: int,
                        resolution_step: int, step: int) -> None:

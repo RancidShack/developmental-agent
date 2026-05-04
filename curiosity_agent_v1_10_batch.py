@@ -382,6 +382,15 @@ def run_one(run_idx, seed, hazard_cost, report=True,
             counterfactual_obs=cf_obs,
             belief_revision_obs=br_obs,
         )
+
+        # Process PE substrate now that bundle is assembled.
+        # PE observer on_run_end errors with mixed cell types when called
+        # directly; the bundle's prediction_error list is safe to read.
+        if br_obs is not None:
+            pe_records = getattr(bundle, 'prediction_error', None) or []
+            br_obs.process_pe_substrate(pe_records)
+            bundle.belief_revision = br_obs.get_substrate()
+
         layer      = V16ReportingLayer(bundle)
         statements = layer.generate_report()
         summary    = _compute_summary(
