@@ -1,0 +1,24 @@
+arch,run_idx,seed,hazard_cost,env2_seed,env2_activation_step,env2_phase_1_end_step,env2_end_state_banked_step,env2_yellow_pre_transition_entries,env2_yellow_resolution_window,env2_green_pre_transition_entries,env2_green_resolution_window,env2_q5_chain_count,env2_q5_mean_chain_depth,att_blue_mastery_step,att_blue_mastery_env,predicted_record_state_at_run_end,att_blue_sequence_position,env2_mastery_order_sequence,env2_att_yellow_mastery_step,env2_att_green_mastery_step,env2_actual_steps
+v1_13_5,0,202358875,0.1,202368875,,,,1,,0,,0,0.0,89,2,confirmed,2,"['att_free_0', 'att_green', 'att_blue', 'att_yellow', 'att_free_3', 'att_free_1']",105,66,800000
+v1_13_5,1,1869897005,0.1,1869907005,,,,1,,3,,0,0.0,118,2,confirmed,2,"['att_free_0', 'att_green', 'att_blue', 'att_yellow', 'att_free_2', 'att_free_1']",134,75,800000
+v1_13_5,2,1489290374,0.1,1489300374,,,,1,,0,,0,0.0,,,unresolvable,,"['att_free_0', 'att_free_2', 'att_free_3']",,,800000
+v1_13_5,3,1108683743,0.1,1108693743,,,,1,,0,,0,0.0,1993,2,confirmed,4,"['att_free_0', 'att_free_2', 'att_free_3', 'att_yellow', 'att_blue', 'att_green']",1978,220788,800000
+v1_13_5,6,1915669724,0.1,1915679724,,,,1,,0,,0,0.0,7100,2,confirmed,3,"['att_free_1', 'att_free_2', 'att_yellow', 'att_blue']",7058,,800000
+v1_13_5,8,1154456462,0.1,1154466462,,,,1,,0,,0,0.0,93,2,confirmed,4,"['att_free_0', 'att_free_1', 'att_free_2', 'att_yellow', 'att_blue', 'att_green']",62,139,800000
+v1_13_5,13,1303621320,1.0,1303631320,,,,1,,0,,0,0.0,326979,2,confirmed,4,"['att_free_1', 'att_free_2', 'att_free_3', 'att_green', 'att_blue', 'att_yellow']",326993,326970,800000
+v1_13_5,17,1829339557,1.0,1829349557,,,,1,,0,,0,0.0,64320,2,confirmed,2,"['att_free_2', 'att_free_1', 'att_blue', 'att_yellow']",64326,,800000
+v1_13_5,18,1349394039,1.0,1349404039,,,,1,,1,,0,0.0,16271,2,confirmed,0,"['att_blue', 'att_green', 'att_free_1', 'att_free_2', 'att_free_3', 'att_yellow']",355889,16276,800000
+v1_13_5,19,968787408,1.0,968797408,,,,1,,0,,0,0.0,5642,2,confirmed,3,"['att_free_0', 'att_free_2', 'att_free_3', 'att_blue', 'att_green']",,5659,800000
+v1_13_5,20,271697600,2.0,271707600,,,,1,,0,,0,0.0,81418,2,confirmed,2,"['att_free_1', 'att_free_2', 'att_blue', 'att_green', 'att_yellow']",219555,81443,800000
+v1_13_5,21,1939235730,2.0,1939245730,,,,1,,0,,0,0.0,126,2,confirmed,2,"['att_free_0', 'att_green', 'att_blue', 'att_yellow']",134,50,800000
+v1_13_5,22,1558629099,2.0,1558639099,,,,1,,0,,0,0.0,353,2,confirmed,2,"['att_free_0', 'att_green', 'att_blue', 'att_free_1', 'att_free_2']",,207,800000
+v1_13_5,25,317470319,2.0,317480319,,,,1,,0,,0,0.0,294,2,confirmed,4,"['att_free_0', 'att_free_1', 'att_free_2', 'att_yellow', 'att_blue', 'att_green']",258,120293,800000
+v1_13_5,26,1985008449,2.0,1985018449,,,,1,,1,,0,0.0,12560,2,confirmed,2,"['att_free_1', 'att_free_2', 'att_blue', 'att_yellow', 'att_free_3', 'att_green']",12568,321012,800000
+v1_13_5,27,1604401818,2.0,1604411818,,,,1,,0,,0,0.0,20599,2,confirmed,2,"['att_free_1', 'att_free_2', 'att_blue', 'att_yellow']",20605,,800000
+v1_13_5,30,565380326,10.0,565390326,,,,1,,0,,0,0.0,109,2,confirmed,1,"['att_free_0', 'att_blue', 'att_green', 'att_free_1', 'att_free_2']",,118,800000
+v1_13_5,31,184773695,10.0,184783695,,,,1,,0,,0,0.0,158,2,confirmed,2,"['att_free_0', 'att_green', 'att_blue', 'att_yellow', 'att_free_1', 'att_free_2']",165,125,800000
+v1_13_5,34,1091098563,10.0,1091108563,,,,1,,1,,0,0.0,65,2,confirmed,2,"['att_free_0', 'att_green', 'att_blue', 'att_yellow']",133,37,800000
+v1_13_5,35,611153045,10.0,611163045,,,,2,,0,,0,0.0,,,unresolvable,,"['att_free_0', 'att_free_2', 'att_free_3']",,,800000
+v1_13_5,36,230546414,10.0,230556414,,,,1,,0,,0,0.0,,,unresolvable,,"['att_free_0', 'att_free_1', 'att_free_3']",,,800000
+v1_13_5,37,1898084544,10.0,1898094544,,,,1,,0,,0,0.0,86,2,confirmed,4,"['att_free_0', 'att_free_1', 'att_free_2', 'att_yellow', 'att_blue', 'att_green']",74,749301,800000
+v1_13_5,38,1517477913,10.0,1517487913,,,,1,,0,,0,0.0,7734,2,confirmed,0,"['att_blue', 'att_green', 'att_free_1', 'att_free_2']",,7749,800000
