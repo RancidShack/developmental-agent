@@ -1,0 +1,77 @@
+========================================================================
+v0.13 CHARACTERISATION
+                  hazard_cost         = 1.0
+                  flag_threshold      = 3
+                  mastery_threshold   = 3
+                  mastery_bonus       = 1.0
+========================================================================
+Life length              : 160000 steps
+Environment size         : 20x20
+Passable scope           : 319
+Hazard cells             : 5
+Attractor cells          : 6
+
+Phase 1 (Prescribed traversal):
+  Completed at step      : 331
+  Cells covered          : 318/319
+  Path length            : 331 actions
+
+Phase 2 (Integration): 95669 steps
+  Attractor visit ratio  : 1.20x chance
+  Attention CV           : 1.20
+
+Phase 3 (Autonomy): 64000 steps
+  Attractor visit ratio  : 0.01x chance
+  Attention CV           : 5.57
+  Attention concentration: 130.5x uniform
+  P3 visits to mastered  : 17
+  P3 visits to unmastered: 0
+
+MASTERY LAYER (v0.11):
+  Attractors mastered      : 5/6
+  Time to first mastery    : 352
+  Time to final mastery    : 35885
+  Mastery order sequence   :
+    1. (4, 15)
+    2. (9, 10)
+    3. (16, 3)
+    4. (11, 5)
+    5. (3, 3)
+  Per-attractor visit counts:
+    (3, 3): 90 [MASTERED]
+    (4, 15): 71 [MASTERED]
+    (9, 10): 87 [MASTERED]
+    (11, 5): 491 [MASTERED]
+    (15, 16): 1
+    (16, 3): 1436 [MASTERED]
+
+THREAT LAYER (v0.10 inherited, v0.12 signature-matching):
+  Hazards flagged          : 3/5
+  Time to first flag       : 31336
+  Time to second flag      : 33413
+  Time to final flag       : 34419
+  First-entry conversions  : 2
+  Cost on sig-matched cells: 2.00
+  Actions gated by layer   — P2: 16723  P3:  146
+
+END-STATE LAYER (v0.13):
+  End-state cell location  : (14, 7)
+  Activation step          : None
+  End-state found step     : None
+  Post-activation discovery: activation did not fire
+  End-state visits         : 0
+  End-state banked         : False
+
+RULE ADHERENCE:
+  Frame-directed blocked attempts  — P1:    0  P2:    0  P3:    0
+  Actual hazard entries            — P1:    0  P2:   10  P3:    0
+  Total cost incurred              : 10.00
+
+Total state-action pairs mastered  : 417
+
+Top 5 preferred cells at end of life:
+  (16, 8): preference = 26.44
+  (17, 9): preference = 26.02
+  (16, 6): preference = 25.90
+  (14, 11): preference = 25.82
+  (17, 6): preference = 25.80

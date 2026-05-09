@@ -1,0 +1,66 @@
+========================================================================
+v0.11 CHARACTERISATION
+                  hazard_cost         = 1.0
+                  flag_threshold      = 3
+                  mastery_threshold   = 3
+                  mastery_bonus       = 1.0
+========================================================================
+Life length              : 20000 steps
+Environment size         : 20x20
+Passable scope           : 319
+Hazard cells             : 5
+Attractor cells          : 6
+
+Phase 1 (Prescribed traversal):
+  Completed at step      : 331
+  Cells covered          : 318/319
+  Path length            : 331 actions
+
+Phase 2 (Integration): 11669 steps
+  Attractor visit ratio  : 5.18x chance
+  Attention CV           : 2.34
+
+Phase 3 (Autonomy): 8000 steps
+  Attractor visit ratio  : 0.46x chance
+  Attention CV           : 3.22
+  Attention concentration: 45.9x uniform
+  P3 visits to mastered  : 69
+  P3 visits to unmastered: 0
+
+MASTERY LAYER (v0.11):
+  Attractors mastered      : 5/6
+  Time to first mastery    : 340
+  Time to final mastery    : 11839
+  Mastery order sequence   :
+    1. (4, 15)
+    2. (9, 10)
+    3. (11, 5)
+    4. (16, 3)
+    5. (3, 3)
+  Per-attractor visit counts:
+    (3, 3): 69 [MASTERED]
+    (4, 15): 79 [MASTERED]
+    (9, 10): 33 [MASTERED]
+    (11, 5): 29 [MASTERED]
+    (15, 16): 1
+    (16, 3): 1000 [MASTERED]
+
+THREAT LAYER (v0.10, inherited):
+  Hazards flagged          : 2/5
+  Time to first flag       : 10803
+  Time to final flag       : 12993
+  Actions gated by layer   — P2: 1553  P3: 4687
+
+RULE ADHERENCE:
+  Frame-directed blocked attempts  — P1:    0  P2:    0  P3:    0
+  Actual hazard entries            — P1:    0  P2:    4  P3:    3
+  Total cost incurred              : 7.00
+
+Total state-action pairs mastered  : 88
+
+Top 5 preferred cells at end of life:
+  (16, 3): preference = 26.79 (ATTRACTOR MASTERED)
+  (15, 8): preference = 20.63
+  (15, 2): preference = 20.27
+  (5, 1): preference = 17.71
+  (14, 3): preference = 17.67

@@ -1,0 +1,68 @@
+========================================================================
+v0.12 CHARACTERISATION
+                  hazard_cost         = 1.0
+                  flag_threshold      = 3
+                  mastery_threshold   = 3
+                  mastery_bonus       = 1.0
+========================================================================
+Life length              : 20000 steps
+Environment size         : 20x20
+Passable scope           : 319
+Hazard cells             : 5
+Attractor cells          : 6
+
+Phase 1 (Prescribed traversal):
+  Completed at step      : 331
+  Cells covered          : 318/319
+  Path length            : 331 actions
+
+Phase 2 (Integration): 11669 steps
+  Attractor visit ratio  : 1.86x chance
+  Attention CV           : 2.05
+
+Phase 3 (Autonomy): 8000 steps
+  Attractor visit ratio  : 0.62x chance
+  Attention CV           : 3.96
+  Attention concentration: 116.6x uniform
+  P3 visits to mastered  : 93
+  P3 visits to unmastered: 0
+
+MASTERY LAYER (v0.11):
+  Attractors mastered      : 4/6
+  Time to first mastery    : 1555
+  Time to final mastery    : 10284
+  Mastery order sequence   :
+    1. (3, 3)
+    2. (4, 15)
+    3. (15, 16)
+    4. (9, 10)
+  Per-attractor visit counts:
+    (3, 3): 197 [MASTERED]
+    (4, 15): 79 [MASTERED]
+    (9, 10): 15 [MASTERED]
+    (11, 5): 1
+    (15, 16): 214 [MASTERED]
+    (16, 3): 1
+
+THREAT LAYER (v0.10 inherited, v0.12 signature-matching):
+  Hazards flagged          : 3/5
+  Time to first flag       : 1057
+  Time to second flag      : 1086
+  Time to final flag       : 1087
+  First-entry conversions  : 2
+  Cost on sig-matched cells: 2.00
+  Actions gated by layer   — P2: 5075  P3:  334
+
+RULE ADHERENCE:
+  Frame-directed blocked attempts  — P1:    0  P2:    0  P3:    0
+  Actual hazard entries            — P1:    0  P2:    6  P3:    0
+  Total cost incurred              : 6.00
+
+Total state-action pairs mastered  : 85
+
+Top 5 preferred cells at end of life:
+  (4, 2): preference = 24.93
+  (1, 6): preference = 19.29
+  (6, 18): preference = 19.11
+  (7, 17): preference = 18.68
+  (3, 2): preference = 18.62 (near attractor)

@@ -1,0 +1,51 @@
+========================================================================
+v0.10 CHARACTERISATION
+                  hazard_cost    = 1.0
+                  flag_threshold = 3
+========================================================================
+Life length              : 20000 steps
+Environment size         : 20x20
+Passable scope           : 319
+Hazard cells             : 5
+Attractor cells          : 6
+
+Phase 1 (Prescribed traversal):
+  Completed at step      : 331
+  Cells covered          : 318/319
+  Path length            : 331 actions
+
+Phase 2 (Integration): 11669 steps
+  Attractor visit ratio  : 7.19x chance
+  Attention CV           : 1.94
+
+Phase 3 (Autonomy): 8000 steps
+  Attractor visit ratio  : 12.45x chance
+  Attention CV           : 3.50
+  Attention concentration: 74.7x uniform
+
+THREAT LAYER (v0.10):
+  Hazards flagged          : 1/5
+  Time to first flag       : 11429
+  Time to final flag       : 11429
+  Cost paid up to final flag: 4.00
+  Actions gated by layer   — P1:    0  P2: 4687  P3:  241
+  Per-hazard entry counts  :
+    (5, 8): 0
+    (5, 9): 0
+    (6, 8): 0
+    (14, 13): 1
+    (14, 14): 3 [FLAGGED]
+
+RULE ADHERENCE:
+  Frame-directed blocked attempts  — P1:    0  P2:    0  P3:    0
+  Actual hazard entries            — P1:    0  P2:    4  P3:    0
+  Total cost incurred              : 4.00
+
+Total pairs mastered       : 84
+
+Top 5 preferred cells at end of life:
+  (15, 16): preference = 501.72 (ATTRACTOR)
+  (4, 15): preference = 49.46 (ATTRACTOR)
+  (15, 17): preference = 21.67 (near attractor)
+  (14, 8): preference = 19.23
+  (17, 18): preference = 18.93
