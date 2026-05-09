@@ -97,12 +97,12 @@ DIST_OBJ  = 6
 # Form vocabulary (extended for BLUE family and future families)
 # ---------------------------------------------------------------------------
 FLAT         = "FLAT"
-SQUARE_2D    = "SQUARE_2D"
-TRIANGLE_2D  = "TRIANGLE_2D"
-CIRCLE_2D    = "CIRCLE_2D"     # att_blue form
-SPHERE_3D    = "SPHERE_3D"     # haz_blue form
-PYRAMID_3D   = "PYRAMID_3D"
-CUBE_3D      = "CUBE_3D"       # reserved for future families
+SQUARE_2D    = "SQUARE_2D"     # face of CUBE_3D; att_blue form (v1.16+)
+TRIANGLE_2D  = "TRIANGLE_2D"   # face of PYRAMID_3D; att_yellow form
+CIRCLE_2D    = "CIRCLE_2D"     # face of SPHERE_3D; att_green form (v1.16+)
+SPHERE_3D    = "SPHERE_3D"     # haz_green form (v1.16+)
+PYRAMID_3D   = "PYRAMID_3D"    # haz_yellow form; haz_grey form
+CUBE_3D      = "CUBE_3D"       # haz_blue form (v1.16+); face is SQUARE_2D
 
 # ---------------------------------------------------------------------------
 # Colour vocabulary
@@ -152,7 +152,7 @@ ENV1_FAMILIES = [
         "dist_pos": (3.0, 9.0, 3.0),
         "att_id":   "att_green",
         "att_pos":  (2.0, 11.0, 2.0),
-        "att_form": SQUARE_2D,
+        "att_form": CIRCLE_2D,        # v1.16: SPHERE_3D↔CIRCLE_2D (geometric pair)
         "haz_id":   "haz_green",
         "haz_pos":  (9.0, 10.0, 8.0),
         "haz_form": SPHERE_3D,
@@ -177,7 +177,7 @@ ENV1_FAMILIES = [
         "att_form": None,
         "haz_id":   "haz_blue",
         "haz_pos":  (7.0, 8.0, 3.0),  # distinct from GREEN/YELLOW objects
-        "haz_form": SPHERE_3D,
+        "haz_form": CUBE_3D,           # v1.16: CUBE_3D↔SQUARE_2D (geometric pair)
     },
 ]
 
@@ -193,7 +193,7 @@ ENV2_FAMILIES = [
         "dist_pos": (9.0, 3.0, 9.0),   # ENV2 position — differs from ENV1
         "att_id":   "att_green",
         "att_pos":  (10.0, 2.0, 10.0), # ENV2 position
-        "att_form": SQUARE_2D,
+        "att_form": CIRCLE_2D,          # v1.16: SPHERE_3D↔CIRCLE_2D
         "haz_id":   "haz_green",
         "haz_pos":  (2.0, 9.0, 4.0),   # ENV2 position
         "haz_form": SPHERE_3D,
@@ -215,7 +215,7 @@ ENV2_FAMILIES = [
         "dist_pos": None,
         "att_id":   "att_blue",
         "att_pos":  (5.0, 6.0, 10.0),  # att_blue: directed search target
-        "att_form": CIRCLE_2D,
+        "att_form": SQUARE_2D,          # v1.16: CUBE_3D↔SQUARE_2D (geometric pair)
         "haz_id":   None,              # haz_blue is in ENV1
         "haz_pos":  None,
         "haz_form": None,
