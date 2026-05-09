@@ -1,1 +1,0 @@
-arch,run_idx,seed,hazard_cost,num_steps,env,object_id,surprise_step,resolution_step,chain_depth,chain_complete,truncated_at,links_surprise,links_precondition,links_mastery_formation,links_phase1_absence,links_suppressed_approach,links_belief_revision
